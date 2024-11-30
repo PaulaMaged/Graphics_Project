@@ -48,6 +48,9 @@ float sunlightAngle = 0.0f; // Angle to animate sunlight movement
 
 Model_3DS tree_model;
 GLTexture tex_ground;
+Model_3DS model_fish;
+Model_3DS model_seahorse;
+Model_3DS model_fish2;
 
 void setupSunlight() {
 	// Sunlight properties
@@ -334,6 +337,28 @@ void myDisplay(void)
 
 	drawCharacter();
 
+	// Draw fish Model
+	glPushMatrix();
+	glTranslatef(0, 5, 0);
+	glScalef(70.0, 70.0, 70);
+	//model_fish.Draw(); // works
+	glPopMatrix();
+
+	// Draw seahorse Model
+	glPushMatrix();
+	glTranslatef(-10, 4, -5);
+	glScalef(100.0, 100.0, 100);
+	//model_seahorse.Draw(); //doesnt work
+	glPopMatrix();
+
+	//treasure chest
+	glPushMatrix();
+	glTranslatef(0, 0, -5);
+	glScalef(0.5, 0.5, 0.5);
+	model_fish2.Draw();
+	glPopMatrix();
+
+
 	drawSkyBox();
 
 	glPopMatrix();
@@ -445,6 +470,9 @@ void myReshape(int w, int h)
 void LoadAssets()
 {
 	tree_model.Load("Models/tree/Tree1.3ds");
+	model_fish.Load("Models/fish2/fish2/Fish N130416.3DS");
+	model_fish2.Load("Models/seahorse/uploads_files_4198821_treasure_chest.3ds");
+	model_seahorse.Load("Models/bottle/chembottle.3DS");
 
 	// Loading texture files
 	tex_ground.Load("Textures/ground.bmp");
