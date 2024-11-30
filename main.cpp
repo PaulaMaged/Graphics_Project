@@ -51,6 +51,8 @@ GLTexture tex_ground;
 Model_3DS model_fish;
 Model_3DS model_seahorse;
 Model_3DS model_fish2;
+Model_3DS model_player;
+Model_3DS model_collectable;
 
 void setupSunlight() {
 	// Sunlight properties
@@ -250,7 +252,7 @@ void movePlayer(char button) {
 		addVector.y -= 4;
 		break;
 	}
-	
+
 	Vector newPosition = playerPosition + addVector;
 
 	if (!isPlayerPositionValid(newPosition)) return;
@@ -358,6 +360,14 @@ void myDisplay(void)
 	model_fish2.Draw();
 	glPopMatrix();
 
+	glPushMatrix();
+	glTranslatef(15, 2, 10);
+	glScalef(0.050, 0.050, 0.050);
+	glRotatef(180.f, 0, 1, 0);
+	glRotatef(45.f, 0, 1, 0);
+	model_player.Draw();
+	glPopMatrix();
+	glPushMatrix();
 
 	drawSkyBox();
 
@@ -425,7 +435,7 @@ void myKeyboard(unsigned char button, int x, int y)
 	case ']':
 		playerPosition.printVector("Player Position");
 		break;
-	case '1': 
+	case '1':
 		updateView(FIRST);
 		break;
 	case '3':
@@ -473,6 +483,8 @@ void LoadAssets()
 	model_fish.Load("Models/fish2/fish2/Fish N130416.3DS");
 	model_fish2.Load("Models/seahorse/uploads_files_4198821_treasure_chest.3ds");
 	model_seahorse.Load("Models/bottle/chembottle.3DS");
+	model_player.Load("Models/ben10uncle/Man Beach N240414.3DS");
+	model_collectable.Load("Models/coin/uploads_files_233898_50ct.3DS");
 
 	// Loading texture files
 	tex_ground.Load("Textures/ground.bmp");
