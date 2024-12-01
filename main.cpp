@@ -366,6 +366,72 @@ void myDisplay(void)
 	//model_collectable.Draw(); //works
 	glPopMatrix();
 
+	glPushMatrix();
+glTranslatef(-10, 0, -15); // Seaweed 1
+glScalef(0.5, 0.5, 0.5);
+model_seaweed.Draw();
+glPopMatrix();
+
+glPushMatrix();
+glTranslatef(8, 0, -12); // Seaweed 2
+glScalef(0.5, 0.5, 0.5);
+model_seaweed.Draw();
+glPopMatrix();
+
+glPushMatrix();
+glTranslatef(15, 0, 10); // Seaweed 3
+glScalef(0.5, 0.5, 0.5);
+model_seaweed.Draw();
+glPopMatrix();
+
+glPushMatrix();
+glTranslatef(-7, 0, 8); // Seaweed 4
+glScalef(0.5, 0.5, 0.5);
+model_seaweed.Draw();
+glPopMatrix();
+
+glPushMatrix();
+glTranslatef(12, 0, -5); // Seaweed 5
+glScalef(0.5, 0.5, 0.5);
+model_seaweed.Draw();
+glPopMatrix();
+
+glPushMatrix();
+glTranslatef(-14, 0, 14); // Seaweed 6
+glScalef(0.5, 0.5, 0.5);
+model_seaweed.Draw();
+glPopMatrix();
+
+glPushMatrix();
+glTranslatef(0, 0, 18); // Seaweed 7
+glScalef(0.5, 0.5, 0.5);
+model_seaweed.Draw();
+glPopMatrix();
+
+glPushMatrix();
+glTranslatef(-20, 0, -10); // Seaweed 8
+glScalef(0.5, 0.5, 0.5);
+model_seaweed.Draw();
+glPopMatrix();
+
+glPushMatrix();
+glTranslatef(18, 0, -3); // Seaweed 9
+glScalef(0.5, 0.5, 0.5);
+model_seaweed.Draw();
+glPopMatrix();
+
+glPushMatrix();
+glTranslatef(-5, 0, -8); // Seaweed 10
+glScalef(0.5, 0.5, 0.5);
+model_seaweed.Draw();
+glPopMatrix();
+
+glPushMatrix();
+glTranslatef(-5, 0, -8); // Seaweed 10
+glScalef(50, 50, 50);
+model_anchor.Draw();
+glPopMatrix();
+	
 	drawSkyBox();
 
 	glPopMatrix();
@@ -482,9 +548,10 @@ void LoadAssets()
 	model_bottle.Load("Models/bottle/chembottle.3ds");
 	model_player.Load("Models/ben10uncle/man.3ds");
 	model_collectable.Load("Models/coin/uploads_files_233898_50ct.3ds");
-
+	model_seaweed.Load("Models/seaweed/Grass 2 N180822.3ds");
+	
 	// Loading texture files
-	tex_ground.Load("Textures/ground.bmp");
+	tex_ground.Load("Textures/sand.bmp");
 	loadBMP(&tex, "Textures/blu-sky-3.bmp", true);
 }
 
