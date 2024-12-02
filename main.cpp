@@ -30,11 +30,11 @@ wallPositions gameBounds{ -30, 30, -40, 40 };
 MoveMode moveMode = PLAYER;
 
 //camera vectors
-Vector freeCamPosition;
+Vector freeCamPosition(-1, 55, 80);
 Vector Eye;
 Vector At;
 Vector Up(0, 1, 0);
-VIEWS currentView = VIEWS::FIRST;
+VIEWS currentView = VIEWS::FREE;
 
 //player
 Vector playerPosition(-5, 0, 15);
@@ -46,12 +46,19 @@ float sunlightIntensity = 1.0f; // Intensity of the main sunlight
 float bioluminescentPhase = 0.0f; // Animation phase for bioluminescent light
 float sunlightAngle = 0.0f; // Angle to animate sunlight movement
 
+//game status
+float score = 0.0f;
+float elapsedTime = 0.0f;
+int lastUpdateTime = 0;
+
 Model_3DS tree_model;
 GLTexture tex_ground;
 Model_3DS model_fish;
 Model_3DS model_bottle;
 Model_3DS model_player;
 Model_3DS model_collectable;
+Model_3DS model_seaweed;
+Model_3DS model_anchor;
 
 void setupSunlight() {
 	// Sunlight properties
@@ -114,10 +121,6 @@ void setupLighting() {
 	glEnable(GL_LIGHT1); // Bioluminescent light
 }
 
-float score = 0.0f;
-float elapsedTime = 0.0f;
-int lastUpdateTime = 0;
-
 void renderBitmapString(float x, float y, void* font, const char* string) {
 	const char* c;
 	glRasterPos2f(x, y);
@@ -126,7 +129,7 @@ void renderBitmapString(float x, float y, void* font, const char* string) {
 	}
 }
 
-void updateGameState(int value) {
+void updateGameState() {
 	int currentTime = glutGet(GLUT_ELAPSED_TIME);
 	float deltaTime = (currentTime - lastUpdateTime) / 1000.0f;
 
@@ -141,9 +144,6 @@ void updateGameState(int value) {
 
 	// Trigger a redraw without blocking the main loop
 	glutPostRedisplay();
-
-	// Reschedule the timer callback
-	glutTimerFunc(16, updateGameState, 0);
 }
 
 void renderTextOverlay() {
@@ -188,7 +188,6 @@ void renderTextOverlay() {
 	glPopMatrix();
 }
 
-
 void myInit(void)
 {
 	glMatrixMode(GL_PROJECTION);
@@ -206,9 +205,6 @@ void myInit(void)
 }
 
 bool isPlayerPositionValid(Vector newPosition) {
-	if (newPosition.x < gameBounds.negativeX || newPosition.x > gameBounds.positiveX) return false;
-	if (newPosition.z < gameBounds.negativeZ || newPosition.z > gameBounds.positiveZ) return false;
-
 	return true;
 }
 
@@ -239,7 +235,7 @@ void RenderGround()
 	glBindTexture(GL_TEXTURE_2D, tex_ground.texture[0]);	// Bind the ground texture
 
 	glPushMatrix();
-	glScaled(2, 0, 4);
+	glScaled(5, 5, 5);
 	glBegin(GL_QUADS);
 	glNormal3f(0, 1, 0);	// Set quad normal direction.
 	glTexCoord2f(0, 0);		// Set tex coordinates ( Using (0,0) -> (5,5) with texture wrapping set to GL_REPEAT to simulate the ground repeated grass texture).
@@ -256,43 +252,6 @@ void RenderGround()
 	glEnable(GL_LIGHTING);	// Enable lighting again for other entites coming throung the pipeline.
 
 	glColor3f(1, 1, 1);	// Set material back to white instead of grey used for the ground texture.
-}
-
-void drawWalls() {
-	// Draw Tree Model
-
-	glPushMatrix();
-	glTranslatef(-30, 0, 0);
-
-	for (int i = 0; i < 10; i++) {
-		glPushMatrix();
-		glTranslatef(0, 0, 40 + i * -8);
-		tree_model.Draw();
-		glPopMatrix();
-	}
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(30, 0, 0);
-
-	for (int i = 0; i < 10; i++) {
-		glPushMatrix();
-		glTranslatef(0, 0, 40 + i * -8);
-		tree_model.Draw();
-		glPopMatrix();
-	}
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(0, 0, -40);
-
-	for (int i = 0; i <= 10; i++) {
-		glPushMatrix();
-		glTranslatef(-25 + i * 5, 0, 0);
-		tree_model.Draw();
-		glPopMatrix();
-	}
-	glPopMatrix();
 }
 
 void movePlayer(char button) {
@@ -390,11 +349,103 @@ void drawAxes() {
 	glPopAttrib();
 }
 
+void faceDirection() {
+	GLdouble angle = 0;
+	Vector direction(0, 1, 0);
+
+	switch (playerEnumDirection) {
+	case FRONT:
+		break;
+	case LEFT:
+		angle = 90;
+		break;
+	case RIGHT:
+		angle = -90;
+		break;
+	case BACK:
+		angle = 180;
+		break;
+	}
+
+	glRotated(angle, direction.x, direction.y, direction.z);
+}
+
 void drawCharacter() {
 
 	glPushMatrix();
 	glTranslated(playerPosition.x, playerPosition.y, playerPosition.z);
-	glutWireCube(2);
+	glRotated(180, 0, 1, 0);
+	faceDirection();
+	glScaled(10, 10, 10);
+	model_player.Draw();
+	glPopMatrix();
+}
+
+void drawSeaWeeds() {
+	glPushMatrix();
+	glTranslatef(-10, 0, -15); // Seaweed 1
+	glScalef(0.5, 0.5, 0.5);
+	model_seaweed.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(8, 0, -12); // Seaweed 2
+	glScalef(0.5, 0.5, 0.5);
+	model_seaweed.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(15, 0, 10); // Seaweed 3
+	glScalef(0.5, 0.5, 0.5);
+	model_seaweed.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-7, 0, 8); // Seaweed 4
+	glScalef(0.5, 0.5, 0.5);
+	model_seaweed.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(12, 0, -5); // Seaweed 5
+	glScalef(0.5, 0.5, 0.5);
+	model_seaweed.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-14, 0, 14); // Seaweed 6
+	glScalef(0.5, 0.5, 0.5);
+	model_seaweed.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0, 0, 18); // Seaweed 7
+	glScalef(0.5, 0.5, 0.5);
+	model_seaweed.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-20, 0, -10); // Seaweed 8
+	glScalef(0.5, 0.5, 0.5);
+	model_seaweed.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(18, 0, -3); // Seaweed 9
+	glScalef(0.5, 0.5, 0.5);
+	model_seaweed.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-5, 0, -8); // Seaweed 10
+	glScalef(0.5, 0.5, 0.5);
+	model_seaweed.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-5, 0, -8); // Seaweed 10
+	glScalef(50, 50, 50);
+	model_anchor.Draw();
 	glPopMatrix();
 }
 
@@ -409,103 +460,29 @@ void myDisplay(void)
 
 	RenderGround();
 
-	drawWalls();
-
 	drawCharacter();
 
 	// Draw fish Model
 	glPushMatrix();
-	glTranslatef(0, 5, 0);
+	glTranslatef(25, 5, 25);
 	glScalef(70.0, 70.0, 70);
-	//model_fish.Draw(); // works
+	model_fish.Draw(); // works
 	glPopMatrix();
 
 	// Draw bottle Model
 	glPushMatrix();
-	glTranslatef(0, 5, 0);
+	glTranslatef(-25, 5, 25);
 	glScalef(1, 1, 1);
-	//model_bottle.Draw(); //works
+	model_bottle.Draw(); //works
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0, 5, 0);
-	glScalef(10, 10, 10);
-	//glRotatef(180.f, 0, 1, 0);
-	//glRotatef(45.f, 0, 1, 0);
-	model_player.Draw();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(0, 10, 0);
+	glTranslatef(-25, 5, -25);
 	glScaled(5, 5, 5);
-	//model_collectable.Draw(); //works
+	model_collectable.Draw(); //works
 	glPopMatrix();
 
-	glPushMatrix();
-glTranslatef(-10, 0, -15); // Seaweed 1
-glScalef(0.5, 0.5, 0.5);
-model_seaweed.Draw();
-glPopMatrix();
-
-glPushMatrix();
-glTranslatef(8, 0, -12); // Seaweed 2
-glScalef(0.5, 0.5, 0.5);
-model_seaweed.Draw();
-glPopMatrix();
-
-glPushMatrix();
-glTranslatef(15, 0, 10); // Seaweed 3
-glScalef(0.5, 0.5, 0.5);
-model_seaweed.Draw();
-glPopMatrix();
-
-glPushMatrix();
-glTranslatef(-7, 0, 8); // Seaweed 4
-glScalef(0.5, 0.5, 0.5);
-model_seaweed.Draw();
-glPopMatrix();
-
-glPushMatrix();
-glTranslatef(12, 0, -5); // Seaweed 5
-glScalef(0.5, 0.5, 0.5);
-model_seaweed.Draw();
-glPopMatrix();
-
-glPushMatrix();
-glTranslatef(-14, 0, 14); // Seaweed 6
-glScalef(0.5, 0.5, 0.5);
-model_seaweed.Draw();
-glPopMatrix();
-
-glPushMatrix();
-glTranslatef(0, 0, 18); // Seaweed 7
-glScalef(0.5, 0.5, 0.5);
-model_seaweed.Draw();
-glPopMatrix();
-
-glPushMatrix();
-glTranslatef(-20, 0, -10); // Seaweed 8
-glScalef(0.5, 0.5, 0.5);
-model_seaweed.Draw();
-glPopMatrix();
-
-glPushMatrix();
-glTranslatef(18, 0, -3); // Seaweed 9
-glScalef(0.5, 0.5, 0.5);
-model_seaweed.Draw();
-glPopMatrix();
-
-glPushMatrix();
-glTranslatef(-5, 0, -8); // Seaweed 10
-glScalef(0.5, 0.5, 0.5);
-model_seaweed.Draw();
-glPopMatrix();
-
-glPushMatrix();
-glTranslatef(-5, 0, -8); // Seaweed 10
-glScalef(50, 50, 50);
-model_anchor.Draw();
-glPopMatrix();
+	drawSeaWeeds();
 	
 	drawSkyBox();
 	
@@ -619,8 +596,6 @@ void myReshape(int w, int h)
 
 void LoadAssets()
 {
-	tree_model.Load("Models/tree/Tree1.3ds");
-
 	model_fish.Load("Models/fish2/fish2/Fish N130416.3ds");
 	model_bottle.Load("Models/bottle/chembottle.3ds");
 	model_player.Load("Models/ben10uncle/man.3ds");
@@ -665,6 +640,7 @@ void handleView() {
 }
 
 void gameLoop(int value) {
+	updateGameState();
 	myDisplay();
 	glutTimerFunc(16, gameLoop, 0);
 }
@@ -689,7 +665,6 @@ void main(int argc, char** argv)
 	glutReshapeFunc(myReshape);
 
 	lastUpdateTime = glutGet(GLUT_ELAPSED_TIME);
-	glutTimerFunc(16, updateGameState, 0);
 	
 	LoadAssets();
 	glEnable(GL_DEPTH_TEST);
