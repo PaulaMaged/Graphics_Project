@@ -535,13 +535,7 @@ void myDisplay(void)
 		model_bottle.Draw();
 		glPopMatrix();
 	}
-	if (bottleCollected) {
-		glPushMatrix();
-		glTranslatef(-1000, 10000, 100000);
-		glScalef(1, 1, 1);
-		model_bottle.Draw();
-		glPopMatrix();
-	}
+
 	glPushMatrix();
 	glTranslatef(-25, 5, -25);
 	glScaled(20, 20, 20);
