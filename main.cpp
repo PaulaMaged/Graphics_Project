@@ -60,6 +60,58 @@ Model_3DS model_collectable;
 Model_3DS model_seaweed;
 Model_3DS model_anchor;
 
+
+//mohamed
+class Vector3f {
+public:
+	float x, y, z;
+
+	Vector3f(float _x = 0.0f, float _y = 0.0f, float _z = 0.0f) {
+		x = _x;
+		y = _y;
+		z = _z;
+	}
+
+	Vector3f operator+(Vector3f& v) {
+		return Vector3f(x + v.x, y + v.y, z + v.z);
+	}
+
+	Vector3f operator-(Vector3f& v) {
+		return Vector3f(x - v.x, y - v.z, z - v.z);
+	}
+
+	Vector3f operator*(float n) {
+		return Vector3f(x * n, y * n, z * n);
+	}
+
+	Vector3f unit() {
+		float mag = sqrt(x * x + y * y + z * z);
+		return Vector3f(x / mag, y / mag, z / mag);
+	}
+
+	Vector3f cross(Vector3f v) {
+		return Vector3f(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
+	}
+};
+
+Vector3f bottlePosition(-25, 5 ,25); // Example position of the bottle
+float bottleRadius = 0.1f; // Define a radius for the bottle
+float collisionRadius = 0.15f; // Define a collision radius for the player
+bool bottleCollected = false; // Tracks if the bottle has been collected
+
+float tolerance = 5;
+bool checkCollisionWithBottle() {
+	float dx = playerPosition.x - bottlePosition.x;
+	float dz = playerPosition.z - bottlePosition.z;
+	float dy = playerPosition.y - bottlePosition.y;;
+	float distance = sqrt(dx * dx + dz * dz + dy * dy);
+
+	// Check if the distance is less than the sum of the radii
+	return distance <= (collisionRadius + bottleRadius + tolerance);
+
+}
+
+//mohamed
 void setupSunlight() {
 	// Sunlight properties
 	GLfloat ambientLight[] = { 0.1f * sunlightIntensity, 0.2f * sunlightIntensity, 0.3f * sunlightIntensity, 1.0f };
@@ -469,16 +521,30 @@ void myDisplay(void)
 	model_fish.Draw(); // works
 	glPopMatrix();
 
-	// Draw bottle Model
-	glPushMatrix();
-	glTranslatef(-25, 5, 25);
-	glScalef(1, 1, 1);
-	model_bottle.Draw(); //works
-	glPopMatrix();
+	if (!bottleCollected && checkCollisionWithBottle()) {
+		bottleCollected = true; // Mark as collected
+		score += 10.0f; // Increment score
+	}
 
+
+	// Draw bottle only if it hasn't been collected
+	if (!bottleCollected) {
+		glPushMatrix();
+		glTranslatef(-25, 5, 25);
+		glScalef(1, 1, 1);
+		model_bottle.Draw();
+		glPopMatrix();
+	}
+	if (bottleCollected) {
+		glPushMatrix();
+		glTranslatef(-1000, 10000, 100000);
+		glScalef(1, 1, 1);
+		model_bottle.Draw();
+		glPopMatrix();
+	}
 	glPushMatrix();
 	glTranslatef(-25, 5, -25);
-	glScaled(5, 5, 5);
+	glScaled(20, 20, 20);
 	model_collectable.Draw(); //works
 	glPopMatrix();
 
