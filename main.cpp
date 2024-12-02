@@ -114,6 +114,81 @@ void setupLighting() {
 	glEnable(GL_LIGHT1); // Bioluminescent light
 }
 
+float score = 0.0f;
+float elapsedTime = 0.0f;
+int lastUpdateTime = 0;
+
+void renderBitmapString(float x, float y, void* font, const char* string) {
+	const char* c;
+	glRasterPos2f(x, y);
+	for (c = string; *c != '\0'; c++) {
+		glutBitmapCharacter(font, *c);
+	}
+}
+
+void updateGameState(int value) {
+	int currentTime = glutGet(GLUT_ELAPSED_TIME);
+	float deltaTime = (currentTime - lastUpdateTime) / 1000.0f;
+
+	// Update elapsed time
+	elapsedTime += deltaTime;
+
+	// Optional: Add game logic here for score updates
+	// For example:
+	// score += someGameLogic();
+
+	lastUpdateTime = currentTime;
+
+	// Trigger a redraw without blocking the main loop
+	glutPostRedisplay();
+
+	// Reschedule the timer callback
+	glutTimerFunc(16, updateGameState, 0);
+}
+
+void renderTextOverlay() {
+	// Save current matrix states
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+	// Set up orthographic projection
+	int viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	gluOrtho2D(0, viewport[2], 0, viewport[3]);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	// Disable depth testing and lighting for text
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+
+	// Set text color to white
+	glColor3f(1.0f, 1.0f, 1.0f);
+
+	// Prepare text buffers
+	char scoreText[50], timeText[50];
+	sprintf(scoreText, "Score: %.2f", score);
+	sprintf(timeText, "Time: %.2f seconds", elapsedTime);
+
+	// Render text
+	renderBitmapString(10, viewport[3] - 30, GLUT_BITMAP_HELVETICA_18, scoreText);
+	renderBitmapString(10, viewport[3] - 60, GLUT_BITMAP_HELVETICA_18, timeText);
+
+	// Restore OpenGL states
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
+
 void myInit(void)
 {
 	glMatrixMode(GL_PROJECTION);
@@ -433,7 +508,9 @@ model_anchor.Draw();
 glPopMatrix();
 	
 	drawSkyBox();
-
+	
+	renderTextOverlay();
+	
 	glPopMatrix();
 
 	glutSwapBuffers();
@@ -611,6 +688,9 @@ void main(int argc, char** argv)
 	glutKeyboardFunc(myKeyboard);
 	glutReshapeFunc(myReshape);
 
+	lastUpdateTime = glutGet(GLUT_ELAPSED_TIME);
+	glutTimerFunc(16, updateGameState, 0);
+	
 	LoadAssets();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
