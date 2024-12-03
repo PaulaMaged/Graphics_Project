@@ -103,11 +103,43 @@ float tolerance = 5;
 bool checkCollisionWithBottle() {
 	float dx = playerPosition.x - bottlePosition.x;
 	float dz = playerPosition.z - bottlePosition.z;
-	float dy = playerPosition.y - bottlePosition.y;;
+	float dy = playerPosition.y - bottlePosition.y;
 	float distance = sqrt(dx * dx + dz * dz + dy * dy);
 
 	// Check if the distance is less than the sum of the radii
 	return distance <= (collisionRadius + bottleRadius + tolerance);
+
+}
+
+Vector3f CoinPosition(-25, 5, -25); // Example position of the bottle
+float CoinRadius = 0.1f; // Define a radius for the bottle
+bool CoinCollected = false; // Tracks if the bottle has been collected
+
+
+bool checkCollisionWithCoin() {
+	float dx = playerPosition.x - CoinPosition.x;
+	float dz = playerPosition.z - CoinPosition.z;
+	float dy = playerPosition.y - CoinPosition.y;
+	float distance = sqrt(dx * dx + dz * dz + dy * dy);
+
+	// Check if the distance is less than the sum of the radii
+	return distance <= (collisionRadius + CoinRadius + tolerance);
+
+}
+
+Vector3f FishPosition(25, 5, 25); // Example position of the bottle
+float FishRadius = 0.1f; // Define a radius for the bottle
+bool FishCollected = false; // Tracks if the bottle has been collected
+
+
+bool checkCollisionWithFish() {
+	float dx = playerPosition.x - FishPosition.x;
+	float dz = playerPosition.z - FishPosition.z;
+	float dy = playerPosition.y - FishPosition.y;
+	float distance = sqrt(dx * dx + dz * dz + dy * dy);
+
+	// Check if the distance is less than the sum of the radii
+	return distance <= (collisionRadius + FishRadius + tolerance);
 
 }
 
@@ -514,13 +546,7 @@ void myDisplay(void)
 
 	drawCharacter();
 
-	// Draw fish Model
-	glPushMatrix();
-	glTranslatef(25, 5, 25);
-	glScalef(70.0, 70.0, 70);
-	model_fish.Draw(); // works
-	glPopMatrix();
-
+	//bottle
 	if (!bottleCollected && checkCollisionWithBottle()) {
 		bottleCollected = true; // Mark as collected
 		score += 10.0f; // Increment score
@@ -542,12 +568,48 @@ void myDisplay(void)
 		model_bottle.Draw();
 		glPopMatrix();
 	}
-	glPushMatrix();
-	glTranslatef(-25, 5, -25);
-	glScaled(20, 20, 20);
-	model_collectable.Draw(); //works
-	glPopMatrix();
+	
 
+	//coin
+	if (!CoinCollected && checkCollisionWithCoin()) {
+		CoinCollected = true; // Mark as collected
+		score += 10.0f; // Increment score
+	}
+
+
+	// Draw bottle only if it hasn't been collected
+	if (!CoinCollected) {
+		glPushMatrix();
+		glTranslatef(-25, 5, -25);
+		glScaled(20, 20, 20);
+		model_collectable.Draw(); //works
+		glPopMatrix();
+	}
+	if (CoinCollected) {
+		glPushMatrix();
+		glTranslatef(-10000, -100000, -10000);
+		glScaled(20, 20, 20);
+		model_collectable.Draw(); //works
+		glPopMatrix();
+	}
+	
+	//fish
+	// Fish collision and rendering
+	if (!FishCollected && checkCollisionWithFish()) {
+		FishCollected = true; // Mark as collected
+		score += 10.0f; // Increment score
+		std::cout << "Fish collected! Score: " << score << std::endl; // Debug message
+	}
+
+	if (!FishCollected) {
+		// Draw fish Model
+		glPushMatrix();
+		glTranslatef(25, 5, 25);
+		glScalef(70.0, 70.0, 70);
+		model_fish.Draw(); // works
+		glPopMatrix();
+	}
+	
 	drawSeaWeeds();
 	
 	drawSkyBox();
