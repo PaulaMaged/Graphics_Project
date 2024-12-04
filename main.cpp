@@ -547,14 +547,19 @@ void drawSeaWeeds() {
 //Behavior:
 // - Only plays once
 // - main thread should not end to finish playing (Played in Async mode)
-void playSound(const char *soundFileName) {
+void playSound(const char *soundFileName, bool force) {
 	std::string soundFilePath;
 	
 	soundFilePath += "Sounds/";
 	soundFilePath += soundFileName;
 	soundFilePath += ".wav";
 
-	PlaySound(soundFilePath.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+	if (force) {
+		PlaySound(soundFilePath.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+	}
+	else {
+		PlaySound(soundFilePath.c_str(), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP);
+	}
 }
 
 void myDisplay(void)
@@ -572,7 +577,7 @@ void myDisplay(void)
 
 	//bottle
 	if (!bottleCollected && checkCollisionWithBottle()) {
-		playSound("Pick-up");
+		playSound("Pick-up", 1);
 		bottleCollected = true; // Mark as collected
 		score += 10.0f; // Increment score
 	}
@@ -591,7 +596,7 @@ void myDisplay(void)
 
 	//coin
 	if (!CoinCollected && checkCollisionWithCoin()) {
-		playSound("Pick-up");
+		playSound("Pick-up", 1);
 		CoinCollected = true; // Mark as collected
 		score += 10.0f; // Increment score
 	}
@@ -610,7 +615,7 @@ void myDisplay(void)
 	//fish
 	// Fish collision and rendering
 	if (!FishCollected && checkCollisionWithFish()) {
-		playSound("Pick-up");
+		playSound("Pick-up", 1);
 		FishCollected = true; // Mark as collected
 		score += 10.0f; // Increment score
 		std::cout << "Fish collected! Score: " << score << std::endl; // Debug message
