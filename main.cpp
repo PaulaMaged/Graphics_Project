@@ -16,6 +16,7 @@
 #include "GLTexture.h"
 #include <glut.h>
 #include <GL/glu.h>
+#include <chrono>
 
 #include "main.h"
 
@@ -65,7 +66,13 @@ Model_3DS model_player;
 Model_3DS model_collectable;
 Model_3DS model_seaweed;
 Model_3DS model_anchor;
-
+Model_3DS model_pathA;
+Model_3DS model_shell;
+Model_3DS model_rock;
+Model_3DS model_diver;
+Model_3DS model_star;
+Model_3DS model_chest;
+Model_3DS model_coral;
 
 //mohamed
 class Vector3f {
@@ -473,73 +480,198 @@ void drawCharacter() {
 	glPopMatrix();
 }
 
-void drawSeaWeeds() {
+float fishPositions[][3] = {
+	{4, 4, 0},    // Fish 1
+	{6, 4.5, -2}, // Fish 2
+	{3, 3.5, 2},  // Fish 3
+	{5, 4, 3},    // Fish 4
+	{7, 5, -1}    // Fish 5
+};
+float fishScales[] = { 70.0, 65.0, 75.0, 72.0, 68.0 }; // Slightly different sizes
+float fishSpeeds[] = { 0.01f, 0.015f, 0.02f, 0.013f, 0.018f }; // Different swim speeds
+float fishAngles[] = { 0, 0, 0, 0, 0 }; // Keep track of each fish's angle
+
+double getTime() {
+	static auto start = std::chrono::steady_clock::now();
+	auto now = std::chrono::steady_clock::now();
+	return std::chrono::duration<double>(now - start).count();
+}
+
+void drawSchoolOfFish() {
+	for (int i = 0; i < 5; ++i) {
+		glPushMatrix();
+
+		// Fish-specific movement: add unique animation offsets
+		float waveOffset = sin(getTime() * fishSpeeds[i]) * 0.5f;
+
+		glTranslatef(fishPositions[i][0] + waveOffset, fishPositions[i][1], fishPositions[i][2]);
+		glRotatef(fishAngles[i], 0, 1, 0); // Rotate fish to "swim"
+		glScalef(fishScales[i], fishScales[i], fishScales[i]);
+
+		// Update angles for continuous swimming motion
+		fishAngles[i] += fishSpeeds[i] * 50.0f;
+		if (fishAngles[i] > 360.0f) fishAngles[i] -= 360.0f;
+
+		// Draw each fish
+		model_fish.Draw();
+
+		glPopMatrix();
+	}
+}
+
+float grassPositions[][3] = {
+	{-28, 0, 6},    // Fish 1
+	{-29, 0, 10}, // Fish 2
+	{-26, 0, 8},  // Fish 3
+	{-30, 0, 27},    // Fish 4
+	{-33, 0, 25}    // Fish 5
+};
+
+void drawSeaWeeds() { 
+	for (int i = 0; i < 5; ++i) {
+		glPushMatrix();
+
+		glScalef(0.5, 0.5, 0.5);
+		glTranslatef(grassPositions[i][0], grassPositions[i][1], grassPositions[i][2]);
+
+		// Calculate bioluminescence intensity
+		float time = getTime(); // Replace with getTime() if not using GLFW
+		float intensity = (sin(time * 2.0f) + 1.0f) * 0.5f; // Oscillates between 0.0 and 1.0
+
+		// Set emissive material properties for bioluminescent effect
+		GLfloat emissionColor[] = { 0.0f, 0.8f * intensity, 0.2f * intensity, 1.0f }; // Green glow
+		glMaterialfv(GL_FRONT, GL_EMISSION, emissionColor);
+
+		// Draw the seaweed model
+		model_seaweed.Draw();
+
+		// Reset emission to default (no glow)
+		GLfloat defaultEmission[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+		glMaterialfv(GL_FRONT, GL_EMISSION, defaultEmission);
+
+		glPopMatrix();
+	}
+}
+
+//level2 rock pathway, can have some coins placed in between
+//optional tbh, if not used place the coins in the cave instead
+void drawRocksWithGap() {
+	// Draw the first rock
 	glPushMatrix();
-	glTranslatef(-10, 0, -15); // Seaweed 1
-	glScalef(0.5, 0.5, 0.5);
-	model_seaweed.Draw();
+	glTranslatef(0, 1, -12); // Position for the first anchor
+	glRotatef(180.0f, 0, 0, 1); // Orientation for the anchor
+	glScalef(0.2, 0.2, 0.2); // Scale for the anchor
+	model_pathA.Draw();
 	glPopMatrix();
 
+	// Draw the second rock
 	glPushMatrix();
-	glTranslatef(8, 0, -12); // Seaweed 2
-	glScalef(0.5, 0.5, 0.5);
-	model_seaweed.Draw();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(15, 0, 10); // Seaweed 3
-	glScalef(0.5, 0.5, 0.5);
-	model_seaweed.Draw();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(-7, 0, 8); // Seaweed 4
-	glScalef(0.5, 0.5, 0.5);
-	model_seaweed.Draw();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(12, 0, -5); // Seaweed 5
-	glScalef(0.5, 0.5, 0.5);
-	model_seaweed.Draw();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(-14, 0, 14); // Seaweed 6
-	glScalef(0.5, 0.5, 0.5);
-	model_seaweed.Draw();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(0, 0, 18); // Seaweed 7
-	glScalef(0.5, 0.5, 0.5);
-	model_seaweed.Draw();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(-20, 0, -10); // Seaweed 8
-	glScalef(0.5, 0.5, 0.5);
-	model_seaweed.Draw();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(18, 0, -3); // Seaweed 9
-	glScalef(0.5, 0.5, 0.5);
-	model_seaweed.Draw();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(-5, 0, -8); // Seaweed 10
-	glScalef(0.5, 0.5, 0.5);
-	model_seaweed.Draw();
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(-5, 0, -8); // Seaweed 10
-	glScalef(50, 50, 50);
-	model_anchor.Draw();
+	glTranslatef(0, 1, 0); // Position for the second anchor (relative gap)
+	glRotatef(180.0f, 0, 0, 1); // Orientation for the anchor
+	glScalef(0.2, 0.2, 0.2); // Scale for the anchor
+	model_pathA.Draw();
 	glPopMatrix();
 }
+
+//scaled down for level 1, collectible, scale it up to be a big treasure chest for level 2
+void drawTreasureChest(){
+glPushMatrix();
+glTranslatef(0, 0, 0);
+glScalef(1.05, 1.05, 1.05);
+model_chest.Draw();
+glPopMatrix();
+}
+
+//shell "clam" collectible placed randomly for level1
+void drawShell(){
+
+	glPushMatrix();
+	glTranslatef(0, 0, 16); // Shell 
+	glScalef(20, 20, 20);
+	model_shell.Draw();
+	glPopMatrix();
+	
+	glPushMatrix();
+	glTranslatef(17, 0, 18); 
+	glScalef(20, 20, 20);
+	model_shell.Draw();
+	glPopMatrix();
+	
+	glPushMatrix();
+	glTranslatef(11, 0, 0);
+	glScalef(20, 20, 20);
+	model_shell.Draw();
+	glPopMatrix();
+	
+	glPushMatrix();
+	glTranslatef(2, 0, 6); 
+	glScalef(20, 20, 20);
+	model_shell.Draw();
+	glPopMatrix();
+	
+	glPushMatrix();
+	glTranslatef(-5, 0, -4); 
+	glScalef(20, 20, 20);
+	model_shell.Draw();
+	glPopMatrix(); 
+	
+	glPushMatrix();
+	glTranslatef(-9, 0, 2); 
+	glScalef(20, 20, 20);
+	model_shell.Draw();
+	glPopMatrix(); 
+}
+
+//coral "tree" obstacle in level1
+void drawCoral(){
+	glPushMatrix();
+	glTranslatef(-16, 0, 8); 
+	glRotatef(90.0f, 0, 1, 0);
+	glScalef(0.8, 0.8, 0.8);
+	model_coral.Draw();
+	glPopMatrix();
+}
+
+//golden star, golden relic for level 2, collectible
+void drawStar(){
+	glPushMatrix();
+	glTranslatef(4, 1, 0); 
+	glRotatef(90.0f, 1, 0, 0);
+	glScalef(0.003, 0.003, 0.003);
+	model_star.Draw();
+	glPopMatrix();
+}
+
+//two rocks in different sizes to appear like a cave, seaweed is placed at the entrance (already positioned in the drawseaweed method)
+void drawCave(){
+	glPushMatrix();
+	glTranslatef(-17, 0, 4); // Seaweed 10
+	glRotatef(90.0f, 0, 1, 0);
+	glScalef(0.15, 0.15, 0.15);
+	model_rock.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-17, 0, 4); // Seaweed 10
+	glRotatef(90.0f, 0, 1, 0);
+	glScalef(0.2, 0.2, 0.2);
+	model_rock.Draw();
+	glPopMatrix();
+}
+
+//level 1: 
+//obstacles: coral tree
+// fish for appearance
+//collectible: shell, can draw a white sphere on top of shell to look like a pearl
+//collectible: small treasure chest
+//collectible: coins
+
+//level 2:
+//obstacles: cave, rocky pathway optional
+//seaweed placed at cave entrance for appearance (and can be scattered everywhere too)
+//collectible: treasure chest scaled up
+//collectible: golder star
+//collectible: gemstones (havent added it yet)
 
 //To work: 
 //	- sound format (.wav) 
@@ -757,6 +889,12 @@ void LoadAssets()
 	model_player.Load("Models/Players/Diver_Scuba.3ds");
 	model_collectable.Load("Models/coin/uploads_files_233898_50ct.3ds");
 	model_seaweed.Load("Models/seaweed/Grass 2 N180822.3ds");
+	model_pathA.Load("Models/rockpath/RockWalkway01.3ds");
+	model_shell.Load("Models/fishies/dive.3ds");
+	model_coral.Load("Models/fan/RS04v1.3ds");
+	model_rock.Load("Models/rock/ArchTripple.3ds");
+	model_chest.Load("Models/chest/chest.3ds");
+	model_star.Load("Models/star/Star big.3ds");
 	
 	// Loading texture files
 	tex_ground.Load("Textures/sand.bmp");
