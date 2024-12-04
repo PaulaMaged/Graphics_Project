@@ -1,5 +1,11 @@
 #include <iostream>
+
 #include <Windows.h>
+#include <mmsystem.h>
+#include <string>
+
+#pragma comment(lib, "winmm.lib")
+
 #include <cmath>
 
 #define _USE_MATH_DEFINES
@@ -10,6 +16,7 @@
 #include "GLTexture.h"
 #include <glut.h>
 #include <GL/glu.h>
+#include <chrono>
 
 #include "main.h"
 
@@ -64,6 +71,8 @@ Model_3DS model_shell;
 Model_3DS model_rock;
 Model_3DS model_diver;
 Model_3DS model_star;
+Model_3DS model_chest;
+Model_3DS model_coral;
 
 //mohamed
 class Vector3f {
@@ -379,6 +388,7 @@ void movePlayer(char button) {
 
 	if (!isPlayerPositionValid(newPosition)) return;
 
+	playSound("Swim-shortened");
 	playerPosition.set(newPosition);
 }
 
@@ -517,7 +527,7 @@ float grassPositions[][3] = {
 	{-33, 0, 25}    // Fish 5
 };
 
-void drawSeaweeds() { 
+void drawSeaWeeds() { 
 	for (int i = 0; i < 5; ++i) {
 		glPushMatrix();
 
@@ -663,6 +673,27 @@ void drawCave(){
 //collectible: golder star
 //collectible: gemstones (havent added it yet)
 
+//To work: 
+//	- sound format (.wav) 
+//	- is inside of Sounds folder!
+//Behavior:
+// - Only plays once
+// - main thread should not end to finish playing (Played in Async mode)
+void playSound(const char *soundFileName, bool force) {
+	std::string soundFilePath;
+	
+	soundFilePath += "Sounds/";
+	soundFilePath += soundFileName;
+	soundFilePath += ".wav";
+
+	if (force) {
+		PlaySound(soundFilePath.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+	}
+	else {
+		PlaySound(soundFilePath.c_str(), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP);
+	}
+}
+
 void myDisplay(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -678,6 +709,7 @@ void myDisplay(void)
 
 	//bottle
 	if (!bottleCollected && checkCollisionWithBottle()) {
+		playSound("Pick-up", 1);
 		bottleCollected = true; // Mark as collected
 		score += 10.0f; // Increment score
 	}
@@ -696,6 +728,7 @@ void myDisplay(void)
 
 	//coin
 	if (!CoinCollected && checkCollisionWithCoin()) {
+		playSound("Pick-up", 1);
 		CoinCollected = true; // Mark as collected
 		score += 10.0f; // Increment score
 	}
@@ -714,6 +747,7 @@ void myDisplay(void)
 	//fish
 	// Fish collision and rendering
 	if (!FishCollected && checkCollisionWithFish()) {
+		playSound("Pick-up", 1);
 		FishCollected = true; // Mark as collected
 		score += 10.0f; // Increment score
 		std::cout << "Fish collected! Score: " << score << std::endl; // Debug message
@@ -807,6 +841,14 @@ void myKeyboard(unsigned char button, int x, int y)
 	case '2':
 		updateView(FREE);
 		break;
+	case 'c':
+		std::cout << "start sound fx" << std::endl;
+		playSound("Swim-shortened");
+		break;
+	case 'v':
+		std::cout << "end sound fx" << std::endl;
+		PlaySound(0, 0, 0);
+		break;
 	case 27:
 		exit(0);
 		break;
@@ -849,7 +891,7 @@ void LoadAssets()
 	model_seaweed.Load("Models/seaweed/Grass 2 N180822.3ds");
 	model_pathA.Load("Models/rockpath/RockWalkway01.3ds");
 	model_shell.Load("Models/fishies/dive.3ds");
-	model_coral.Load("Models/fan/RS04v2.3ds");
+	model_coral.Load("Models/fan/RS04v1.3ds");
 	model_rock.Load("Models/rock/ArchTripple.3ds");
 	model_chest.Load("Models/chest/chest.3ds");
 	model_star.Load("Models/star/Star big.3ds");
