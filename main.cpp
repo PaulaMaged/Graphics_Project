@@ -37,7 +37,7 @@ Vector Up(0, 1, 0);
 VIEWS currentView = VIEWS::FREE;
 
 //player
-Vector playerPosition(-5, 0, 15);
+Vector playerPosition(-5, 5, 15);
 DIRECTION playerEnumDirection = FRONT;
 Vector playerVectorDirection(0, 0, -1);
 
@@ -298,6 +298,7 @@ void drawSkyBox() {
 	GLUquadricObj* qobj;
 	qobj = gluNewQuadric();
 	glRotated(90, 1, 0, 1);
+	glScaled(2, 2, 2);
 	glBindTexture(GL_TEXTURE_2D, tex);
 	gluQuadricTexture(qobj, true);
 	gluQuadricNormals(qobj, GL_SMOOTH);
@@ -460,7 +461,7 @@ void drawCharacter() {
 	glTranslated(playerPosition.x, playerPosition.y, playerPosition.z);
 	glRotated(180, 0, 1, 0);
 	faceDirection();
-	glScaled(10, 10, 10);
+	glScaled(0.02, 0.02, 0.02);
 	model_player.Draw();
 	glPopMatrix();
 }
@@ -714,7 +715,7 @@ void LoadAssets()
 {
 	model_fish.Load("Models/fish2/fish2/Fish N130416.3ds");
 	model_bottle.Load("Models/bottle/chembottle.3ds");
-	model_player.Load("Models/ben10uncle/man.3ds");
+	model_player.Load("Models/Players/Diver_Scuba.3ds");
 	model_collectable.Load("Models/coin/uploads_files_233898_50ct.3ds");
 	model_seaweed.Load("Models/seaweed/Grass 2 N180822.3ds");
 	
