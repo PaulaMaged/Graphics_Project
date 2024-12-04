@@ -1,5 +1,11 @@
 #include <iostream>
+
 #include <Windows.h>
+#include <mmsystem.h>
+#include <string>
+
+#pragma comment(lib, "winmm.lib")
+
 #include <cmath>
 
 #define _USE_MATH_DEFINES
@@ -375,6 +381,7 @@ void movePlayer(char button) {
 
 	if (!isPlayerPositionValid(newPosition)) return;
 
+	playSound("Swim-shortened");
 	playerPosition.set(newPosition);
 }
 
@@ -534,6 +541,22 @@ void drawSeaWeeds() {
 	glPopMatrix();
 }
 
+//To work: 
+//	- sound format (.wav) 
+//	- is inside of Sounds folder!
+//Behavior:
+// - Only plays once
+// - main thread should not end to finish playing (Played in Async mode)
+void playSound(const char *soundFileName) {
+	std::string soundFilePath;
+	
+	soundFilePath += "Sounds/";
+	soundFilePath += soundFileName;
+	soundFilePath += ".wav";
+
+	PlaySound(soundFilePath.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+}
+
 void myDisplay(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -549,6 +572,7 @@ void myDisplay(void)
 
 	//bottle
 	if (!bottleCollected && checkCollisionWithBottle()) {
+		playSound("Pick-up");
 		bottleCollected = true; // Mark as collected
 		score += 10.0f; // Increment score
 	}
@@ -567,6 +591,7 @@ void myDisplay(void)
 
 	//coin
 	if (!CoinCollected && checkCollisionWithCoin()) {
+		playSound("Pick-up");
 		CoinCollected = true; // Mark as collected
 		score += 10.0f; // Increment score
 	}
@@ -585,6 +610,7 @@ void myDisplay(void)
 	//fish
 	// Fish collision and rendering
 	if (!FishCollected && checkCollisionWithFish()) {
+		playSound("Pick-up");
 		FishCollected = true; // Mark as collected
 		score += 10.0f; // Increment score
 		std::cout << "Fish collected! Score: " << score << std::endl; // Debug message
@@ -677,6 +703,14 @@ void myKeyboard(unsigned char button, int x, int y)
 		break;
 	case '2':
 		updateView(FREE);
+		break;
+	case 'c':
+		std::cout << "start sound fx" << std::endl;
+		playSound("Swim-shortened");
+		break;
+	case 'v':
+		std::cout << "end sound fx" << std::endl;
+		PlaySound(0, 0, 0);
 		break;
 	case 27:
 		exit(0);

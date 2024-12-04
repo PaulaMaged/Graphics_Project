@@ -138,3 +138,4 @@ extern DIRECTION playerDirection;
 bool isPlayerPositionValid(Vector newPosition);
 void handleView();
 void updateView(VIEWS view);
+void playSound(const char* soundFileName);
