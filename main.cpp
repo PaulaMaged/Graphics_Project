@@ -311,10 +311,7 @@ bool checkCollisionWithcaves() {
 	return false;
 }
 
-
 //mohamed
-
-
 
 void setupSunlight() {
 	// Sunlight properties
@@ -360,7 +357,7 @@ void setupAmbientLighting() {
 void updateLightingAnimation() {
 
 	// Simulate sunlight fading with depth
-	sunlightIntensity = 0.05f + 0.5f * cos((2 * M_PI * elapsedTime) / 10);
+	sunlightIntensity = 0.5f + 0.5f * cos(elapsedTime);
 
 	// Update bioluminescent light phase
 	bioluminescentPhase = (2 * M_PI * elapsedTime / 2);  // Reduced from 0.01f to 0.002f
@@ -411,6 +408,25 @@ void updateGameState() {
 	}
 }
 
+void mouseFunc(int button, int state, int x, int y) {
+	std::cout << "State: " << state << std::endl;
+	std::cout << "Button: " << button << std::endl;
+	std::cout << "X: " << x << std::endl;
+	std::cout << "Y: " << y << std::endl;
+
+	if (button == 0) {
+		for (int i = 0; i < 3; i++) {
+			movePlayer('w');
+		}
+	}
+	else if (button == 2) {
+		for (int i = 0; i < 3; i++) {
+			movePlayer('s');
+		}
+	}
+
+	return;
+}
 
 void renderTextOverlay() {
 	// Save current matrix states
@@ -889,14 +905,14 @@ void drawStars1() {
 	glPushMatrix();
 
 	// Apply position from starPositions array
-		glTranslatef(20.0f, 3.0f, 25.0f);
-		glRotatef(90.0f, 0, 1, 0);   // Align stars with the environment
-		glRotatef(-30.0f, 0, 0, 1); // Tilt for aesthetic effect
-		glScalef(0.017, 0.017, 0.017); // Maintain the golden star's scale
-		// Draw the star model
-		model_star.Draw();
+	glTranslatef(20.0f, 3.0f, 25.0f);
+	glRotatef(90.0f, 0, 1, 0);   // Align stars with the environment
+	glRotatef(-30.0f, 0, 0, 1); // Tilt for aesthetic effect
+	glScalef(0.017, 0.017, 0.017); // Maintain the golden star's scale
+	// Draw the star model
+	model_star.Draw();
 
-		glPopMatrix();
+	glPopMatrix();
 	
 }
 
@@ -1130,27 +1146,15 @@ void displayHunt() {
 	}
 
 	//star1
-	//if (!star1Collected && checkCollisionWithstar1()) {
-	//	playSound("Pick-up", 1);
-	//	star1Collected = true; // Mark as collected
-	//	score += 10.0f; // Increment score
-	//}
+	if (!star1Collected && checkCollisionWithstar1()) {
+		playSound("Pick-up", 1);
+		star1Collected = true; // Mark as collected
+		score += 10.0f; // Increment score
+	}
 
-	//if (!star1Collected) {
-	//	drawStars1();
-	//}
-
-	////star2
-	//if (!star2Collected && checkCollisionWithstar2()) {
-	//	playSound("Pick-up", 1);
-	//	star2Collected = true; // Mark as collected
-	//	score += 10.0f; // Increment score
-	//}
-
-
-	//if (!star2Collected) {
-	//	drawStars2();
-	//}
+	if (!star1Collected) {
+		drawStars1();
+	}
 
 	//gem1
 	if (!gem1Collected && checkCollisionWithgem1()) {
@@ -1391,6 +1395,7 @@ void main(int argc, char** argv)
 	setDisplayFunc();
 	glutIdleFunc(updateLightingAnimation); // Idle function for light animation
 	glutKeyboardFunc(myKeyboard);
+	glutMouseFunc(mouseFunc);
 	glutReshapeFunc(myReshape);
 
 	lastUpdateTime = glutGet(GLUT_ELAPSED_TIME);

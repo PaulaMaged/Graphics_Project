@@ -146,3 +146,4 @@ bool isPlayerPositionValid(Vector newPosition);
 void handleView();
 void updateView(VIEWS view);
 void playSound(const char* soundFileName, bool force = 0);
+void movePlayer(char button);
