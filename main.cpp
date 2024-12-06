@@ -76,7 +76,7 @@ Model_3DS model_diver;
 Model_3DS model_star;
 Model_3DS model_chest;
 Model_3DS model_coral;
-
+Model_3DS model_gems;
 //mohamed
 class Vector3f {
 public:
@@ -144,7 +144,7 @@ bool checkCollisionWithtreasure() {
 }
 
 
-Vector3f CoinPosition(-25, 5, -25); // Example position of the bottle
+Vector3f CoinPosition(-23, 5, -25); // Example position of the bottle
 float CoinRadius = 0.1f; // Define a radius for the bottle
 bool CoinCollected = false; // Tracks if the bottle has been collected
 
@@ -159,6 +159,25 @@ bool checkCollisionWithCoin() {
 	return distance <= (collisionRadius + CoinRadius + tolerance);
 
 }
+
+//paula
+
+Vector3f CoralPosition(-25, 5, -25); // Example position of the bottle
+float CoralRadius = 0.1f; // Define a radius for the bottle
+bool CoralCollected = false; // Tracks if the bottle has been collected
+
+
+bool checkCollisionWithCoral() {
+	float dx = playerPosition.x - CoralPosition.x;
+	float dz = playerPosition.z - CoralPosition.z;
+	float dy = playerPosition.y - CoralPosition.y;
+	float distance = sqrt(dx * dx + dz * dz + dy * dy);
+
+	// Check if the distance is less than the sum of the radii
+	return distance <= (collisionRadius + CoralRadius + tolerance);
+
+}
+
 
 Vector3f FishPosition(25, 5, 25); // Example position of the bottle
 float FishRadius = 0.1f; // Define a radius for the bottle
@@ -500,7 +519,6 @@ void faceDirection() {
 
 	glRotated(angle, direction.x, direction.y, direction.z);
 }
-
 void drawCharacter() {
 
 	glPushMatrix();
@@ -510,6 +528,43 @@ void drawCharacter() {
 	glScaled(0.02, 0.02, 0.02);
 	model_player.Draw();
 	glPopMatrix();
+}
+
+
+
+float gemPositions[][3] = {
+	{-90.0f, 0.5f, -90.0f},  // Gem 1
+	{90.0f, 0.5f, -75.0f},   // Gem 2
+	{75.0f, 0.5f, 90.0f},    // Gem 3
+	{-50.0f, 0.5f, 75.0f},   // Gem 4
+	{0.0f, 0.5f, -50.0f}     // Gem 5
+};
+
+
+// Draw the gems with random offsets
+void drawGems() {
+	// Define bounds for random positioning (around the base positions)
+	const float offsetRange = 5.0f;
+
+	for (int i = 0; i < 5; ++i) {
+		glPushMatrix();
+
+		// Apply base position with random offsets
+		float x = gemPositions[i][0];
+		float y = gemPositions[i][1];
+		float z = gemPositions[i][2];
+
+
+		// Apply transformations
+		glTranslatef(x, y, z);
+		glRotated(180, 0, 1, 0); // Adjust rotation if needed
+		glScaled(2.02, 2.02, 2.02); // Scale gems
+
+		// Draw the gem model
+		model_gems.Draw();
+
+		glPopMatrix();
+	}
 }
 
 float fishPositions[][3] = {
@@ -551,19 +606,22 @@ void drawSchoolOfFish() {
 	}
 }
 
+
+
+
 float grassPositions[][3] = {
-	{-28, 0, 6},    // Fish 1
-	{-29, 0, 10}, // Fish 2
-	{-26, 0, 8},  // Fish 3
-	{-30, 0, 27},    // Fish 4
-	{-33, 0, 25}    // Fish 5
+	{-6, 0, -38},    // Fish 1
+	{10, 0, -50}, // Fish 2
+	{-10, 0, -37},  // Fish 3
+	{-24, 0, -34},    // Fish 4
+	{-13, 0, -45}    // Fish 5
 };
 
-void drawSeaWeeds() { 
+void drawSeaWeeds() {
 	for (int i = 0; i < 5; ++i) {
 		glPushMatrix();
 
-		glScalef(0.5, 0.5, 0.5);
+		glScalef(2, 2, 2);
 		glTranslatef(grassPositions[i][0], grassPositions[i][1], grassPositions[i][2]);
 
 		// Calculate bioluminescence intensity
@@ -584,6 +642,7 @@ void drawSeaWeeds() {
 		glPopMatrix();
 	}
 }
+
 
 //level2 rock pathway, can have some coins placed in between
 //optional tbh, if not used place the coins in the cave instead
@@ -606,7 +665,7 @@ void drawRocksWithGap() {
 }
 
 //scaled down for level 1, collectible, scale it up to be a big treasure chest for level 2
-void drawTreasureChest(){
+void drawTreasureChest() {
 	glPushMatrix();
 	glTranslatef(0, 2, -60);
 	glScalef(2, 2, 2);
@@ -616,82 +675,100 @@ void drawTreasureChest(){
 
 //shell "clam" collectible placed randomly for level1
 //model currently not working "dive.3ds"
-void drawShell(){
+void drawShell() {
 
 	glPushMatrix();
 	glTranslatef(0, 0, 16); // Shell 
 	glScalef(20, 20, 20);
 	model_shell.Draw();
 	glPopMatrix();
-	
+
 	glPushMatrix();
-	glTranslatef(17, 0, 18); 
+	glTranslatef(17, 0, 18);
 	glScalef(20, 20, 20);
 	model_shell.Draw();
 	glPopMatrix();
-	
+
 	glPushMatrix();
 	glTranslatef(11, 0, 0);
 	glScalef(20, 20, 20);
 	model_shell.Draw();
 	glPopMatrix();
-	
+
 	glPushMatrix();
-	glTranslatef(2, 0, 6); 
+	glTranslatef(2, 0, 6);
 	glScalef(20, 20, 20);
 	model_shell.Draw();
 	glPopMatrix();
-	
+
 	glPushMatrix();
-	glTranslatef(-5, 0, -4); 
+	glTranslatef(-5, 0, -4);
 	glScalef(20, 20, 20);
 	model_shell.Draw();
-	glPopMatrix(); 
-	
+	glPopMatrix();
+
 	glPushMatrix();
-	glTranslatef(-9, 0, 2); 
+	glTranslatef(-9, 0, 2);
 	glScalef(20, 20, 20);
 	model_shell.Draw();
-	glPopMatrix(); 
+	glPopMatrix();
 }
 
 //coral "tree" obstacle in level1
-void drawCoral(double x, double y, double z){
+void drawCoral(double x, double y, double z) {
 	glPushMatrix();
-	glTranslatef(x, y, z); 
+	glTranslatef(x, y, z);
 	glRotatef(90.0f, 0, 1, 0);
 	glScalef(0.8, 0.8, 0.8);
 	model_coral.Draw();
 	glPopMatrix();
 }
 
-//golden star, golden relic for level 2, collectible
-void drawStar(){
-	glPushMatrix();
-	glTranslatef(4, 1, 0); 
-	glRotatef(90.0f, 1, 0, 0);
-	glScalef(0.003, 0.003, 0.003);
-	model_star.Draw();
-	glPopMatrix();
+float starPositions[][3] = {
+	{20.0f, 3.0f, 25.0f},  // Star 1
+	{-25.0f, 3.0f, -30.0f}, // Star 2
+	{35.0f, 3.0f, -15.0f},  // Star 3
+	{-40.0f, 3.0f, 20.0f},  // Star 4
+	{0.0f, 3.0f, -50.0f}    // Star 5
+};
+
+void drawStars() {
+	for (int i = 0; i < 5; ++i) {
+		glPushMatrix();
+
+		// Apply position from starPositions array
+		glTranslatef(starPositions[i][0], starPositions[i][1], starPositions[i][2]);
+		glRotatef(90.0f, 0, 1, 0);   // Align stars with the environment
+		glRotatef(-30.0f, 0, 0, 1); // Tilt for aesthetic effect
+		glScalef(0.017, 0.017, 0.017); // Maintain the golden star's scale
+
+		// Draw the star model
+		model_star.Draw();
+
+		glPopMatrix();
+	}
 }
 
 //two rocks in different sizes to appear like a cave, seaweed is placed at the entrance (already positioned in the drawseaweed method)
-void drawCave(){
+void drawCave() {
 	glPushMatrix();
-	glTranslatef(-17, 0, 4); // Seaweed 10
+	glTranslatef(-17, 0, -70); // Seaweed 10
 	glRotatef(90.0f, 0, 1, 0);
-	glScalef(0.15, 0.15, 0.15);
+	glRotatef(180.0f, 0, 1, 0);
+	glRotatef(90.0f, 0, 1, 0);
+	glScalef(0.55, 0.55, 0.55);
 	model_rock.Draw();
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(-17, 0, 4); // Seaweed 10
+	glTranslatef(-17, 0, -70); // Seaweed 10
 	glRotatef(90.0f, 0, 1, 0);
-	glScalef(0.2, 0.2, 0.2);
+	glRotatef(180.0f, 0, 1, 0);
+	glRotatef(90.0f, 0, 1, 0);
+	glScalef(0.8, 0.8, 0.8);
 	model_rock.Draw();
 	glPopMatrix();
 }
-
 //level 1: 
 //obstacles: coral tree
 // fish for appearance
@@ -732,7 +809,7 @@ void displayStart() {
 	glClearColor(0, 0, 0, 0);
 	glutSwapBuffers();
 }
-
+float angle = 0;
 void displayCollect()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -754,7 +831,7 @@ void displayCollect()
 	//model_pearl.Draw();
 	//glPopMatrix();
 
-	drawCoral(CoinPosition.x, CoinPosition.y, CoinPosition.z); //working
+	drawCoral( -25, 5, -25); //working
 
 	//drawTreasureChest(); //works
 
@@ -815,11 +892,10 @@ void displayCollect()
 		score += 10.0f; // Increment score
 	}
 
-
 	// Draw bottle only if it hasn't been collected
 	if (!CoinCollected) {
 		glPushMatrix();
-		glTranslatef(-25, 5, -25);
+		glTranslatef(-23, 5, -25);
 		glScaled(20, 20, 20);
 		model_collectable.Draw(); //works
 		glPopMatrix();
@@ -844,6 +920,9 @@ void displayCollect()
 		glPopMatrix();
 	}
 	
+
+
+
 	drawSeaWeeds();
 
 	glPushMatrix();
@@ -865,6 +944,7 @@ void displayCollect()
 	glutSwapBuffers();
 }
 
+
 void displayHunt() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	setupLighting();
@@ -878,6 +958,12 @@ void displayHunt() {
 	drawCharacter();
 
 	drawSkyBox();
+
+	drawCave();
+	drawTreasureChest();
+	drawStars();
+	drawGems();
+	drawSeaWeeds();
 
 	glPopMatrix();
 	glutSwapBuffers();
@@ -1015,7 +1101,7 @@ void LoadAssets()
 	model_chest.Load("Models/chest/chest.3ds");
 	model_star.Load("Models/star/Star big.3ds");
 	model_pearl.Load("Models/pearls/pearl.3ds");
-	
+	model_gems.Load("Models/pearls/pearl.3ds");
 	// Loading texture files
 	tex_ground.Load("Textures/sand.bmp");
 	loadBMP(&tex, "Textures/blu-sky-3.bmp", true);
