@@ -147,7 +147,7 @@ bool checkCollisionWithtreasure() {
 
 
 
-Vector3f treasure2Position(-15, 2, -80); // Example position of the bottle
+Vector3f treasure2Position(-10, 2, -50); // Example position of the bottle
 float treasure2Radius = 0.2f; // Define a radius for the bottle
 bool treasure2Collected = false; // Tracks if the bottle has been collected
 
@@ -836,7 +836,7 @@ void drawTreasureChest() {
 //scaled down for level 2, collectible, scale it up to be a big treasure chest for level 2
 void drawTreasureChest2() {
 	glPushMatrix();
-	glTranslatef(-15, 2, -80);
+	glTranslatef(-10, 2, -50);
 	glScalef(4, 4, 4);
 	model_chest.Draw();
 	glPopMatrix();
@@ -1157,17 +1157,17 @@ void displayHunt() {
 		drawStars1();
 	}
 
-	//star2
-	if (!star2Collected && checkCollisionWithstar2()) {
-		playSound("Pick-up", 1);
-		star2Collected = true; // Mark as collected
-		score += 10.0f; // Increment score
-	}
+	////star2
+	//if (!star2Collected && checkCollisionWithstar2()) {
+	//	playSound("Pick-up", 1);
+	//	star2Collected = true; // Mark as collected
+	//	score += 10.0f; // Increment score
+	//}
 
 
-	if (!star2Collected) {
-		drawStars2();
-	}
+	//if (!star2Collected) {
+	//	drawStars2();
+	//}
 
 	//gem1
 	if (!gem1Collected && checkCollisionWithgem1()) {
