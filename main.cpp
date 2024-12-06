@@ -144,6 +144,60 @@ bool checkCollisionWithtreasure() {
 }
 
 
+
+Vector3f treasure2Position(0, 2, -57); // Example position of the bottle
+float treasure2Radius = 0.2f; // Define a radius for the bottle
+bool treasure2Collected = false; // Tracks if the bottle has been collected
+
+
+bool checkCollisionWithtreasure2() {
+	float dx = playerPosition.x - treasure2Position.x;
+	float dz = playerPosition.z - treasure2Position.z;
+	float dy = playerPosition.y - treasure2Position.y;
+	float distance = sqrt(dx * dx + dz * dz + dy * dy);
+
+	// Check if the distance is less than the sum of the radii
+	return distance <= (collisionRadius + treasure2Radius + tolerance);
+
+}
+
+
+
+Vector3f gem1Position(-90.0f, 0.5f, -90.0f); // Example position of the bottle
+float gemRadius = 0.1f; // Define a radius for the bottle
+bool gem1Collected = false; // Tracks if the bottle has been collected
+
+
+bool checkCollisionWithgem1() {
+	float dx = playerPosition.x - gem1Position.x;
+	float dz = playerPosition.z - gem1Position.z;
+	float dy = playerPosition.y - gem1Position.y;
+	float distance = sqrt(dx * dx + dz * dz + dy * dy);
+
+	// Check if the distance is less than the sum of the radii
+	return distance <= (collisionRadius + treasureRadius + tolerance);
+
+}
+
+
+Vector3f gem2Position(75.0f, 0.5f, 90.0f); // Example position of the bottle
+bool gem2Collected = false; // Tracks if the bottle has been collected
+
+
+bool checkCollisionWithgem2() {
+	float dx = playerPosition.x - gem2Position.x;
+	float dz = playerPosition.z - gem2Position.z;
+	float dy = playerPosition.y - gem2Position.y;
+	float distance = sqrt(dx * dx + dz * dz + dy * dy);
+
+	// Check if the distance is less than the sum of the radii
+	return distance <= (collisionRadius + treasureRadius + tolerance);
+
+}
+
+
+
+
 Vector3f CoinPosition(-23, 5, -25); // Example position of the bottle
 float CoinRadius = 0.1f; // Define a radius for the bottle
 bool CoinCollected = false; // Tracks if the bottle has been collected
@@ -159,6 +213,40 @@ bool checkCollisionWithCoin() {
 	return distance <= (collisionRadius + CoinRadius + tolerance);
 
 }
+
+
+Vector3f star1Position(20.0f, 3.0f, 25.0f); // Example position of the bottle
+float starRadius = 0.1f; // Define a radius for the bottle
+bool star1Collected = false; // Tracks if the bottle has been collected
+
+
+bool checkCollisionWithstar1() {
+	float dx = playerPosition.x - star1Position.x;
+	float dz = playerPosition.z - star1Position.z;
+	float dy = playerPosition.y - star1Position.y;
+	float distance = sqrt(dx * dx + dz * dz + dy * dy);
+
+	// Check if the distance is less than the sum of the radii
+	return distance <= (collisionRadius + starRadius + tolerance);
+
+}
+
+
+Vector3f star2Position=(-25.0f, 3.0f, -30.0f); // Example position of the bottle
+bool star2Collected = false; // Tracks if the bottle has been collected
+
+
+bool checkCollisionWithstar2() {
+	float dx = playerPosition.x - star2Position.x;
+	float dz = playerPosition.z - star2Position.z;
+	float dy = playerPosition.y - star2Position.y;
+	float distance = sqrt(dx * dx + dz * dz + dy * dy);
+
+	// Check if the distance is less than the sum of the radii
+	return distance <= (collisionRadius + starRadius + tolerance);
+
+}
+
 
 //paula
 
@@ -542,21 +630,11 @@ float gemPositions[][3] = {
 
 
 // Draw the gems with random offsets
-void drawGems() {
+void drawGems1() {
 	// Define bounds for random positioning (around the base positions)
-	const float offsetRange = 5.0f;
-
-	for (int i = 0; i < 5; ++i) {
-		glPushMatrix();
-
-		// Apply base position with random offsets
-		float x = gemPositions[i][0];
-		float y = gemPositions[i][1];
-		float z = gemPositions[i][2];
-
 
 		// Apply transformations
-		glTranslatef(x, y, z);
+		glTranslatef(-90.0f,0.5f, -90.0f);
 		glRotated(180, 0, 1, 0); // Adjust rotation if needed
 		glScaled(2.02, 2.02, 2.02); // Scale gems
 
@@ -564,8 +642,26 @@ void drawGems() {
 		model_gems.Draw();
 
 		glPopMatrix();
-	}
+	
 }
+
+
+// Draw the gems with random offsets
+void drawGems2() {
+	// Define bounds for random positioning (around the base positions)
+
+		// Apply transformations
+	glTranslatef(75.0f, 0.5f, 90.0f);
+	glRotated(180, 0, 1, 0); // Adjust rotation if needed
+	glScaled(2.02, 2.02, 2.02); // Scale gems
+
+	// Draw the gem model
+	model_gems.Draw();
+
+	glPopMatrix();
+
+}
+
 
 float fishPositions[][3] = {
 	{4, 4, 0},    // Fish 1
@@ -673,6 +769,17 @@ void drawTreasureChest() {
 	glPopMatrix();
 }
 
+
+//scaled down for level 2, collectible, scale it up to be a big treasure chest for level 2
+void drawTreasureChest2() {
+	glPushMatrix();
+	glTranslatef(0, 2, -57);
+	glScalef(4, 4, 4);
+	model_chest.Draw();
+	glPopMatrix();
+}
+
+
 //shell "clam" collectible placed randomly for level1
 //model currently not working "dive.3ds"
 void drawShell() {
@@ -732,23 +839,35 @@ float starPositions[][3] = {
 	{0.0f, 3.0f, -50.0f}    // Star 5
 };
 
-void drawStars() {
-	for (int i = 0; i < 5; ++i) {
-		glPushMatrix();
+void drawStars1() {
+	glPushMatrix();
 
-		// Apply position from starPositions array
-		glTranslatef(starPositions[i][0], starPositions[i][1], starPositions[i][2]);
+	// Apply position from starPositions array
+		glTranslatef(20.0f, 3.0f, 25.0f);
 		glRotatef(90.0f, 0, 1, 0);   // Align stars with the environment
 		glRotatef(-30.0f, 0, 0, 1); // Tilt for aesthetic effect
 		glScalef(0.017, 0.017, 0.017); // Maintain the golden star's scale
-
 		// Draw the star model
 		model_star.Draw();
 
 		glPopMatrix();
-	}
+	
 }
 
+void drawStars2() {
+	glPushMatrix();
+
+	// Apply position from starPositions array
+	glTranslatef(-25.0f, 3.0f, -30.0f);
+	glRotatef(90.0f, 0, 1, 0);   // Align stars with the environment
+	glRotatef(-30.0f, 0, 0, 1); // Tilt for aesthetic effect
+	glScalef(0.017, 0.017, 0.017); // Maintain the golden star's scale
+	// Draw the star model
+	model_star.Draw();
+
+	glPopMatrix();
+
+}
 //two rocks in different sizes to appear like a cave, seaweed is placed at the entrance (already positioned in the drawseaweed method)
 void drawCave() {
 	glPushMatrix();
@@ -822,14 +941,6 @@ void displayCollect()
 	RenderGround();
 
 	drawRocksWithGap();
-
-	
-	////add collision to pearl (shaklaha zay el beda fyl le3ba)
-	//glPushMatrix();
-	//glTranslated(25, 1, -25);
-	//glScaled(10, 10, 10);
-	//model_pearl.Draw();
-	//glPopMatrix();
 
 	drawCoral( -25, 5, -25); //working
 
@@ -920,9 +1031,6 @@ void displayCollect()
 		glPopMatrix();
 	}
 	
-
-
-
 	drawSeaWeeds();
 
 	glPushMatrix();
@@ -960,9 +1068,68 @@ void displayHunt() {
 	drawSkyBox();
 
 	drawCave();
-	drawTreasureChest();
-	drawStars();
-	drawGems();
+
+
+	
+	//star1
+	if (!treasure2Collected && checkCollisionWithtreasure2()) {
+		playSound("Pick-up", 1);
+		treasure2Collected = true; // Mark as collected
+		score += 10.0f; // Increment score
+	}
+
+
+	// Draw bottle only if it hasn't been collected
+	if (!treasure2Collected) {
+		drawTreasureChest2();
+	}
+
+
+
+	//star1
+	if (!star1Collected && checkCollisionWithstar1()) {
+		playSound("Pick-up", 1);
+		star1Collected = true; // Mark as collected
+		score += 10.0f; // Increment score
+	}
+
+
+	// Draw bottle only if it hasn't been collected
+	if (!star1Collected) {
+		drawStars1();
+	}
+
+	//star2
+	if (!star2Collected && checkCollisionWithstar2()) {
+		playSound("Pick-up", 1);
+		star2Collected = true; // Mark as collected
+		score += 10.0f; // Increment score
+	}
+
+
+	// Draw bottle only if it hasn't been collected
+	if (!star2Collected) {
+		drawStars2();
+	}
+
+	
+	//gem1
+	if (!gem1Collected && checkCollisionWithgem1()) {
+		playSound("Pick-up", 1);
+		gem1Collected = true; // Mark as collected
+		score += 10.0f; // Increment score
+	}
+
+
+	// Draw bottle only if it hasn't been collected
+	if (!gem1Collected) {
+		drawGems1();
+	}
+	
+	
+	
+
+
 	drawSeaWeeds();
 
 	glPopMatrix();
