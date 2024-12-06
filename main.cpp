@@ -127,6 +127,23 @@ bool checkCollisionWithBottle() {
 
 }
 
+Vector3f treasurePosition(0, 2, -60); // Example position of the bottle
+float treasureRadius = 0.1f; // Define a radius for the bottle
+bool treasureCollected = false; // Tracks if the bottle has been collected
+
+
+bool checkCollisionWithtreasure() {
+	float dx = playerPosition.x - treasurePosition.x;
+	float dz = playerPosition.z - treasurePosition.z;
+	float dy = playerPosition.y - treasurePosition.y;
+	float distance = sqrt(dx * dx + dz * dz + dy * dy);
+
+	// Check if the distance is less than the sum of the radii
+	return distance <= (collisionRadius + treasureRadius + tolerance);
+
+}
+
+
 Vector3f CoinPosition(-25, 5, -25); // Example position of the bottle
 float CoinRadius = 0.1f; // Define a radius for the bottle
 bool CoinCollected = false; // Tracks if the bottle has been collected
@@ -708,9 +725,7 @@ void displayCollect()
 
 	drawRocksWithGap();
 
-	//**add collision to treasure chest**
-	drawTreasureChest();
-
+	
 	//add collision to pearl (shaklaha zay el beda fyl le3ba)
 	glPushMatrix();
 	glTranslated(25, 1, -25);
@@ -741,7 +756,26 @@ void displayCollect()
 		glPopMatrix();
 	}
 
-	
+	//treasure
+	if (!treasureCollected) {
+		drawTreasureChest();
+	}
+	if (!treasureCollected && checkCollisionWithtreasure()) {
+		playSound("Pick-up", 1);
+		treasureCollected = true; // Mark as collected
+		score += 10.0f; // Increment score
+	}
+
+
+	// Draw treasure only if it hasn't been collected
+	if (!treasureCollected) {
+		glPushMatrix();
+		glTranslatef(0, 2, -60);
+		glScaled(20, 20, 20);
+		drawTreasureChest();//works
+		glPopMatrix();
+	}
+
 
 	//coin
 	if (!CoinCollected && checkCollisionWithCoin()) {
