@@ -26,6 +26,9 @@ char title[] = "3D Model Loader Sample";
 int WIDTH = 1280;
 int HEIGHT = 720;
 
+//level number
+LEVELS currentLevel = COLLECT;
+
 // 3D Projection Options
 GLdouble fovy = 45.0;
 GLdouble aspectRatio = (GLdouble)WIDTH / (GLdouble)HEIGHT;
@@ -51,7 +54,6 @@ Vector playerVectorDirection(0, 0, -1);
 // Global variables for lighting animations
 float sunlightIntensity = 1.0f; // Intensity of the main sunlight
 float bioluminescentPhase = 0.0f; // Animation phase for bioluminescent light
-float sunlightAngle = 0.0f; // Angle to animate sunlight movement
 
 //game status
 float score = 0.0f;
@@ -162,12 +164,16 @@ void setupSunlight() {
 	GLfloat ambientLight[] = { 0.1f * sunlightIntensity, 0.2f * sunlightIntensity, 0.3f * sunlightIntensity, 1.0f };
 	GLfloat diffuseLight[] = { 0.7f * sunlightIntensity, 0.8f * sunlightIntensity, 1.0f * sunlightIntensity, 1.0f };
 	GLfloat specularLight[] = { 1.0f * sunlightIntensity, 1.0f * sunlightIntensity, 1.0f * sunlightIntensity, 1.0f };
-	GLfloat lightDirection[] = { -0.5f, -1.0f, -0.3f, 0.0f }; // Directional light
+	GLfloat lightDirection[] = { 0, 1, 0, 0.0f }; // Directional light
+	GLfloat spotDirection[] = {0, -1, 0};
+	GLfloat spotCutOff[] = { 10.0f };
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightDirection);
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spotDirection);
+	glLightfv(GL_LIGHT0, GL_SPOT_CUTOFF, spotCutOff);
 }
 
 void setupBioluminescentLight() {
@@ -197,25 +203,15 @@ void setupAmbientLighting() {
 void updateLightingAnimation() {
 
 	// Simulate sunlight fading with depth
-	sunlightIntensity = 0.5f + 0.5f * cos(sunlightAngle);
-	sunlightAngle += 0.05f;  // Reduced from 0.002f to 0.0005f
-	if (sunlightAngle > 2 * 3.14159f) sunlightAngle -= 2 * 3.14159f;
+	sunlightIntensity = 0.05f + 0.5f * cos((2 * M_PI * elapsedTime) / 10);
 
 	// Update bioluminescent light phase
-	bioluminescentPhase += 0.002f;  // Reduced from 0.01f to 0.002f
-	if (bioluminescentPhase > 2 * 3.14159f) bioluminescentPhase -= 2 * 3.14159f;
-
-	glutPostRedisplay(); // Request redisplay for smooth animation
+	bioluminescentPhase = (2 * M_PI * elapsedTime / 2);  // Reduced from 0.01f to 0.002f
 }
 
 void setupLighting() {
-	setupAmbientLighting();
 	setupSunlight();
 	setupBioluminescentLight();
-
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0); // Sunlight
-	glEnable(GL_LIGHT1); // Bioluminescent light
 }
 
 void renderBitmapString(float x, float y, void* font, const char* string) {
@@ -238,9 +234,6 @@ void updateGameState() {
 	// score += someGameLogic();
 
 	lastUpdateTime = currentTime;
-
-	// Trigger a redraw without blocking the main loop
-	glutPostRedisplay();
 }
 
 void renderTextOverlay() {
@@ -694,7 +687,13 @@ void playSound(const char *soundFileName, bool force) {
 	}
 }
 
-void myDisplay(void)
+void displayStart() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0, 0, 0, 0);
+	glutSwapBuffers();
+}
+
+void displayCollect()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	setupLighting();
@@ -704,6 +703,21 @@ void myDisplay(void)
 	drawAxes();
 
 	RenderGround();
+
+	//drawRocksWithGap();
+
+	//drawCave();
+
+
+	glPushMatrix();
+	glScaled(5, 5, 5);
+	drawStar(); //working
+	//model_shell.Draw(); //not working
+	glPopMatrix();
+
+	//drawCoral(); //working
+
+	//drawTreasureChest(); //works
 
 	drawCharacter();
 
@@ -763,6 +777,8 @@ void myDisplay(void)
 	}
 	
 	drawSeaWeeds();
+
+	drawSchoolOfFish();
 	
 	drawSkyBox();
 	
@@ -770,6 +786,30 @@ void myDisplay(void)
 	
 	glPopMatrix();
 
+	glutSwapBuffers();
+}
+
+void displayHunt() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	setupLighting();
+
+	glPushMatrix();
+
+	drawAxes();
+
+	RenderGround();
+
+	drawCharacter();
+
+	drawSkyBox();
+
+	glPopMatrix();
+	glutSwapBuffers();
+}
+
+void displayEnd() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0, 1, 0, 0);
 	glutSwapBuffers();
 }
 
@@ -841,13 +881,18 @@ void myKeyboard(unsigned char button, int x, int y)
 	case '2':
 		updateView(FREE);
 		break;
+	//**Switch Levels**
 	case 'c':
-		std::cout << "start sound fx" << std::endl;
-		playSound("Swim-shortened");
+		currentLevel = COLLECT;
 		break;
-	case 'v':
-		std::cout << "end sound fx" << std::endl;
-		PlaySound(0, 0, 0);
+	case 'h':
+		currentLevel = HUNT;
+		break;
+	case 'C':
+		currentLevel = START;
+		break;
+	case 'H': 
+		currentLevel = END;
 		break;
 	case 27:
 		exit(0);
@@ -855,8 +900,6 @@ void myKeyboard(unsigned char button, int x, int y)
 	default:
 		break;
 	}
-
-	glutPostRedisplay();
 }
 
 void myReshape(int w, int h)
@@ -933,9 +976,29 @@ void handleView() {
 	myInit();
 }
 
+void setDisplayFunc() {
+	switch (currentLevel) {
+		case START:
+			glutDisplayFunc(displayStart);
+			break;
+		case COLLECT:
+			glutDisplayFunc(displayCollect);
+			break;
+		case HUNT:
+			glutDisplayFunc(displayHunt);
+			break;
+		case END:
+			glutDisplayFunc(displayEnd);
+			break;
+		default:
+			glutDisplayFunc(displayStart);
+	}
+}
+
 void gameLoop(int value) {
 	updateGameState();
-	myDisplay();
+	setDisplayFunc();
+	glutPostRedisplay();
 	glutTimerFunc(16, gameLoop, 0);
 }
 
@@ -953,7 +1016,7 @@ void main(int argc, char** argv)
 
 	glutCreateWindow(title);
 
-	glutDisplayFunc(myDisplay);
+	setDisplayFunc();
 	glutIdleFunc(updateLightingAnimation); // Idle function for light animation
 	glutKeyboardFunc(myKeyboard);
 	glutReshapeFunc(myReshape);
@@ -963,6 +1026,7 @@ void main(int argc, char** argv)
 	LoadAssets();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
+	setupAmbientLighting();
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
 	glEnable(GL_NORMALIZE);

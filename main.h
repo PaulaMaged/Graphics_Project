@@ -4,6 +4,13 @@
 #include <string>
 #include "glut.h"
 
+enum LEVELS {
+	START,
+	COLLECT,
+	HUNT,
+	END
+};
+
 enum MoveMode {
 	CAM,
 	PLAYER
