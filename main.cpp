@@ -47,6 +47,7 @@ Vector Up(0, 1, 0);
 VIEWS currentView = VIEWS::FREE;
 
 //player
+float angle = 0; //handling face direction
 Vector playerPosition(-5, 5, 15);
 DIRECTION playerEnumDirection = FRONT;
 Vector playerVectorDirection(0, 0, -1);
@@ -59,6 +60,7 @@ float bioluminescentPhase = 0.0f; // Animation phase for bioluminescent light
 float score = 0.0f;
 float elapsedTime = 0.0f;
 int lastUpdateTime = 0;
+int END_TIME = 25;
 
 Model_3DS model_pearl;
 Model_3DS tree_model;
@@ -145,7 +147,7 @@ bool checkCollisionWithtreasure() {
 
 
 
-Vector3f treasure2Position(0, 2, -57); // Example position of the bottle
+Vector3f treasure2Position(-15, 2, -80); // Example position of the bottle
 float treasure2Radius = 0.2f; // Define a radius for the bottle
 bool treasure2Collected = false; // Tracks if the bottle has been collected
 
@@ -373,13 +375,31 @@ void updateGameState() {
 	float deltaTime = (currentTime - lastUpdateTime) / 1000.0f;
 
 	// Update elapsed time
-	elapsedTime += deltaTime;
+	if (currentLevel != END) {
+		elapsedTime += deltaTime;
+	}
 
 	// Optional: Add game logic here for score updates
 	// For example:
 	// score += someGameLogic();
 
 	lastUpdateTime = currentTime;
+
+	//level movement
+	if (score >= 50 && checkCollisionWithtreasure2()) {
+		currentLevel = END;
+		return;
+	}
+
+	if (elapsedTime > END_TIME) {
+		currentLevel = END;
+		return;
+	}
+
+	if (currentLevel == COLLECT && score >= 50) {
+		currentLevel = HUNT;
+		return;
+	}
 }
 
 void renderTextOverlay() {
@@ -787,7 +807,7 @@ void drawTreasureChest() {
 //scaled down for level 2, collectible, scale it up to be a big treasure chest for level 2
 void drawTreasureChest2() {
 	glPushMatrix();
-	glTranslatef(0, 2, -57);
+	glTranslatef(-15, 2, -80);
 	glScalef(4, 4, 4);
 	model_chest.Draw();
 	glPopMatrix();
@@ -939,10 +959,10 @@ void playSound(const char *soundFileName, bool force) {
 
 void displayStart() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0, 0, 0, 0);
+	glClearColor(0, 0, 1, 0);
 	glutSwapBuffers();
 }
-float angle = 0;
+
 void displayCollect()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -1085,7 +1105,6 @@ void displayHunt() {
 
 
 	
-	//star1
 	if (!treasure2Collected && checkCollisionWithtreasure2()) {
 		playSound("Pick-up", 1);
 		treasure2Collected = true; // Mark as collected
@@ -1107,8 +1126,6 @@ void displayHunt() {
 		score += 10.0f; // Increment score
 	}
 
-
-	// Draw bottle only if it hasn't been collected
 	if (!star1Collected) {
 		drawStars1();
 	}
@@ -1121,7 +1138,6 @@ void displayHunt() {
 	}
 
 
-	// Draw bottle only if it hasn't been collected
 	if (!star2Collected) {
 		drawStars2();
 	}
@@ -1139,10 +1155,6 @@ void displayHunt() {
 	if (!gem1Collected) {
 		drawGems1();
 	}
-	
-	
-	
-
 
 	drawSeaWeeds();
 
@@ -1152,7 +1164,13 @@ void displayHunt() {
 
 void displayEnd() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0, 1, 0, 0);
+	if (elapsedTime <= END_TIME) {
+		glClearColor(0, 1, 0, 0);
+	}
+	else {
+		glClearColor(1, 0, 0, 0);
+	}
+
 	glutSwapBuffers();
 }
 
