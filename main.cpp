@@ -308,6 +308,7 @@ bool checkCollisionWithcaves() {
 	{
 		
 	}
+	return caves;
 }
 
 
