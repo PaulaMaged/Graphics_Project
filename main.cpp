@@ -302,13 +302,13 @@ bool checkCollisionWithPearl() {
 
 }
 
-bool caves = false;
+bool cavescolided = false;
 bool checkCollisionWithcaves() {
 	if (playerPosition.x >= -65 && playerPosition.x <= 31 && playerPosition.z <= -57 && playerPosition.z >= -77 && playerPosition.y >= 1 && playerPosition.z <= 29) 
 	{
-		
+		cavescolided = true;
 	}
-	return caves;
+	return cavescolided;
 }
 
 
