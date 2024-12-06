@@ -300,6 +300,14 @@ bool checkCollisionWithPearl() {
 
 }
 
+bool caves = false;
+bool checkCollisionWithcaves() {
+	if (playerPosition.x >= -65 && playerPosition.x <= 31 && playerPosition.z <= -57 && playerPosition.z >= -77 && playerPosition.y >= 1 && playerPosition.z <= 29) 
+	{
+		
+	}
+}
+
 
 //mohamed
 
@@ -497,6 +505,10 @@ void movePlayer(char button) {
 	switch (button) {
 	case 'w':
 		addVector.z -= 4;
+		std::cout << "playerx = " << playerPosition.x << std::endl;
+		std::cout << "playery = " << playerPosition.y << std::endl;
+		std::cout << "playerz = " << playerPosition.z << std::endl;
+
 		playerEnumDirection = FRONT;
 		playerVectorDirection.set(0, 0, -1);
 		break;
@@ -504,22 +516,37 @@ void movePlayer(char button) {
 		addVector.z += 4;
 		playerEnumDirection = BACK;
 		playerVectorDirection.set(0, 0, 1);
+		std::cout << "playerx = " << playerPosition.x << std::endl;
+		std::cout << "playery = " << playerPosition.y << std::endl;
+		std::cout << "playerz = " << playerPosition.z << std::endl;
 		break;
 	case 'a':
 		addVector.x -= 4;
 		playerEnumDirection = LEFT;
 		playerVectorDirection.set(-1, 0, 0);
+		std::cout << "playerx = " << playerPosition.x << std::endl;
+		std::cout << "playery = " << playerPosition.y << std::endl;
+		std::cout << "playerz = " << playerPosition.z << std::endl;
 		break;
 	case 'd':
 		addVector.x += 4;
 		playerEnumDirection = RIGHT;
 		playerVectorDirection.set(1, 0, 0);
+		std::cout << "playerx = " << playerPosition.x << std::endl;
+		std::cout << "playery = " << playerPosition.y << std::endl;
+		std::cout << "playerz = " << playerPosition.z << std::endl;
 		break;
 	case 'q':
 		addVector.y += 4;
+		std::cout << "playerx = " << playerPosition.x << std::endl;
+		std::cout << "playery = " << playerPosition.y << std::endl;
+		std::cout << "playerz = " << playerPosition.z << std::endl;
 		break;
 	case 'e':
 		addVector.y -= 4;
+		std::cout << "playerx = " << playerPosition.x << std::endl;
+		std::cout << "playery = " << playerPosition.y << std::endl;
+		std::cout << "playerz = " << playerPosition.z << std::endl;
 		break;
 	}
 
