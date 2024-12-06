@@ -147,7 +147,7 @@ bool checkCollisionWithtreasure() {
 
 
 
-Vector3f treasure2Position(-10, 2, -50); // Example position of the bottle
+Vector3f treasure2Position(-15, 2, -80); // Example position of the bottle
 float treasure2Radius = 0.2f; // Define a radius for the bottle
 bool treasure2Collected = false; // Tracks if the bottle has been collected
 
@@ -302,13 +302,13 @@ bool checkCollisionWithPearl() {
 
 }
 
-bool cavescolided = false;
 bool checkCollisionWithcaves() {
 	if (playerPosition.x >= -65 && playerPosition.x <= 31 && playerPosition.z <= -57 && playerPosition.z >= -77 && playerPosition.y >= 1 && playerPosition.z <= 29) 
 	{
-		cavescolided = true;
+		return true;
 	}
-	return cavescolided;
+
+	return false;
 }
 
 
@@ -481,6 +481,7 @@ bool isPlayerPositionValid(Vector newPosition) {
 		break;
 	case HUNT:
 		//cave collision
+		valid = !checkCollisionWithcaves();
 		break;
 	}
 
@@ -541,10 +542,6 @@ void movePlayer(char button) {
 	switch (button) {
 	case 'w':
 		addVector.z -= 4;
-		std::cout << "playerx = " << playerPosition.x << std::endl;
-		std::cout << "playery = " << playerPosition.y << std::endl;
-		std::cout << "playerz = " << playerPosition.z << std::endl;
-
 		playerEnumDirection = FRONT;
 		playerVectorDirection.set(0, 0, -1);
 		break;
@@ -552,37 +549,23 @@ void movePlayer(char button) {
 		addVector.z += 4;
 		playerEnumDirection = BACK;
 		playerVectorDirection.set(0, 0, 1);
-		std::cout << "playerx = " << playerPosition.x << std::endl;
-		std::cout << "playery = " << playerPosition.y << std::endl;
-		std::cout << "playerz = " << playerPosition.z << std::endl;
 		break;
 	case 'a':
 		addVector.x -= 4;
 		playerEnumDirection = LEFT;
 		playerVectorDirection.set(-1, 0, 0);
-		std::cout << "playerx = " << playerPosition.x << std::endl;
-		std::cout << "playery = " << playerPosition.y << std::endl;
-		std::cout << "playerz = " << playerPosition.z << std::endl;
+
 		break;
 	case 'd':
 		addVector.x += 4;
 		playerEnumDirection = RIGHT;
 		playerVectorDirection.set(1, 0, 0);
-		std::cout << "playerx = " << playerPosition.x << std::endl;
-		std::cout << "playery = " << playerPosition.y << std::endl;
-		std::cout << "playerz = " << playerPosition.z << std::endl;
 		break;
 	case 'q':
 		addVector.y += 4;
-		std::cout << "playerx = " << playerPosition.x << std::endl;
-		std::cout << "playery = " << playerPosition.y << std::endl;
-		std::cout << "playerz = " << playerPosition.z << std::endl;
 		break;
 	case 'e':
 		addVector.y -= 4;
-		std::cout << "playerx = " << playerPosition.x << std::endl;
-		std::cout << "playery = " << playerPosition.y << std::endl;
-		std::cout << "playerz = " << playerPosition.z << std::endl;
 		break;
 	}
 
@@ -836,7 +819,7 @@ void drawTreasureChest() {
 //scaled down for level 2, collectible, scale it up to be a big treasure chest for level 2
 void drawTreasureChest2() {
 	glPushMatrix();
-	glTranslatef(-10, 2, -50);
+	glTranslatef(-15, 2, -80);
 	glScalef(4, 4, 4);
 	model_chest.Draw();
 	glPopMatrix();
@@ -1147,15 +1130,15 @@ void displayHunt() {
 	}
 
 	//star1
-	if (!star1Collected && checkCollisionWithstar1()) {
-		playSound("Pick-up", 1);
-		star1Collected = true; // Mark as collected
-		score += 10.0f; // Increment score
-	}
+	//if (!star1Collected && checkCollisionWithstar1()) {
+	//	playSound("Pick-up", 1);
+	//	star1Collected = true; // Mark as collected
+	//	score += 10.0f; // Increment score
+	//}
 
-	if (!star1Collected) {
-		drawStars1();
-	}
+	//if (!star1Collected) {
+	//	drawStars1();
+	//}
 
 	////star2
 	//if (!star2Collected && checkCollisionWithstar2()) {
