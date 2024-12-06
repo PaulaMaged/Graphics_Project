@@ -176,7 +176,28 @@ bool checkCollisionWithFish() {
 
 }
 
+
+Vector3f PearlPosition(25, 1, -25); // Example position of the bottle
+float PearlRadius = 0.1f; // Define a radius for the bottle
+bool PearlCollected = false; // Tracks if the bottle has been collected
+
+
+bool checkCollisionWithPearl() {
+	float dx = playerPosition.x - PearlPosition.x;
+	float dz = playerPosition.z - PearlPosition.z;
+	float dy = playerPosition.y - PearlPosition.y;
+	float distance = sqrt(dx * dx + dz * dz + dy * dy);
+
+	// Check if the distance is less than the sum of the radii
+	return distance <= (collisionRadius + PearlRadius + tolerance);
+
+}
+
+
 //mohamed
+
+
+
 void setupSunlight() {
 	// Sunlight properties
 	GLfloat ambientLight[] = { 0.1f * sunlightIntensity, 0.2f * sunlightIntensity, 0.3f * sunlightIntensity, 1.0f };
@@ -726,12 +747,12 @@ void displayCollect()
 	drawRocksWithGap();
 
 	
-	//add collision to pearl (shaklaha zay el beda fyl le3ba)
-	glPushMatrix();
-	glTranslated(25, 1, -25);
-	glScaled(10, 10, 10);
-	model_pearl.Draw();
-	glPopMatrix();
+	////add collision to pearl (shaklaha zay el beda fyl le3ba)
+	//glPushMatrix();
+	//glTranslated(25, 1, -25);
+	//glScaled(10, 10, 10);
+	//model_pearl.Draw();
+	//glPopMatrix();
 
 	drawCoral(CoinPosition.x, CoinPosition.y, CoinPosition.z); //working
 
@@ -756,10 +777,24 @@ void displayCollect()
 		glPopMatrix();
 	}
 
-	//treasure
-	if (!treasureCollected) {
-		drawTreasureChest();
+
+	//pearl
+	if (!PearlCollected && checkCollisionWithPearl()) {
+		playSound("Pick-up", 1);
+		PearlCollected = true; // Mark as collected
+		score += 10.0f; // Increment score
 	}
+
+	// Draw bottle only if it hasn't been collected
+	if (!PearlCollected) {
+		glPushMatrix();
+		glTranslated(25, 1, -25);
+		glScaled(10, 10, 10);
+		model_pearl.Draw();
+		glPopMatrix();
+	}
+
+	//treasure
 	if (!treasureCollected && checkCollisionWithtreasure()) {
 		playSound("Pick-up", 1);
 		treasureCollected = true; // Mark as collected
@@ -769,11 +804,7 @@ void displayCollect()
 
 	// Draw treasure only if it hasn't been collected
 	if (!treasureCollected) {
-		glPushMatrix();
-		glTranslatef(0, 2, -60);
-		glScaled(20, 20, 20);
-		drawTreasureChest();//works
-		glPopMatrix();
+		drawTreasureChest();
 	}
 
 
