@@ -441,7 +441,21 @@ void myInit(void)
 }
 
 bool isPlayerPositionValid(Vector newPosition) {
-	return true;
+	Vector oldPosition = playerPosition;
+	playerPosition.set(newPosition);
+	bool valid = true;
+	//check collisions
+	switch (currentLevel) {
+	case COLLECT: 
+		valid = !checkCollisionWithCoral();
+		break;
+	case HUNT:
+		//cave collision
+		break;
+	}
+
+	playerPosition.set(oldPosition);
+	return valid;
 }
 
 void drawSkyBox() {
