@@ -60,7 +60,7 @@ float bioluminescentPhase = 0.0f; // Animation phase for bioluminescent light
 float score = 0.0f;
 float elapsedTime = 0.0f;
 int lastUpdateTime = 0;
-int END_TIME = 25;
+int END_TIME = 60;
 
 Model_3DS model_pearl;
 Model_3DS tree_model;
@@ -401,6 +401,7 @@ void updateGameState() {
 		return;
 	}
 }
+
 
 void renderTextOverlay() {
 	// Save current matrix states
@@ -1103,7 +1104,7 @@ void displayHunt() {
 
 	drawCave();
 
-
+	renderTextOverlay();
 	
 	if (!treasure2Collected && checkCollisionWithtreasure2()) {
 		playSound("Pick-up", 1);
@@ -1116,8 +1117,6 @@ void displayHunt() {
 	if (!treasure2Collected) {
 		drawTreasureChest2();
 	}
-
-
 
 	//star1
 	if (!star1Collected && checkCollisionWithstar1()) {
@@ -1142,7 +1141,6 @@ void displayHunt() {
 		drawStars2();
 	}
 
-	
 	//gem1
 	if (!gem1Collected && checkCollisionWithgem1()) {
 		playSound("Pick-up", 1);
@@ -1151,7 +1149,6 @@ void displayHunt() {
 	}
 
 
-	// Draw bottle only if it hasn't been collected
 	if (!gem1Collected) {
 		drawGems1();
 	}
@@ -1170,6 +1167,8 @@ void displayEnd() {
 	else {
 		glClearColor(1, 0, 0, 0);
 	}
+
+	renderTextOverlay();
 
 	glutSwapBuffers();
 }
