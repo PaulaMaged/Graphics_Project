@@ -60,6 +60,7 @@ float score = 0.0f;
 float elapsedTime = 0.0f;
 int lastUpdateTime = 0;
 
+Model_3DS model_pearl;
 Model_3DS tree_model;
 GLTexture tex_ground;
 Model_3DS model_fish;
@@ -551,7 +552,7 @@ void drawSeaWeeds() {
 void drawRocksWithGap() {
 	// Draw the first rock
 	glPushMatrix();
-	glTranslatef(0, 1, -12); // Position for the first anchor
+	glTranslatef(0, 1, -50); // Position for the first anchor
 	glRotatef(180.0f, 0, 0, 1); // Orientation for the anchor
 	glScalef(0.2, 0.2, 0.2); // Scale for the anchor
 	model_pathA.Draw();
@@ -559,7 +560,7 @@ void drawRocksWithGap() {
 
 	// Draw the second rock
 	glPushMatrix();
-	glTranslatef(0, 1, 0); // Position for the second anchor (relative gap)
+	glTranslatef(0, 1, -70); // Position for the second anchor (relative gap)
 	glRotatef(180.0f, 0, 0, 1); // Orientation for the anchor
 	glScalef(0.2, 0.2, 0.2); // Scale for the anchor
 	model_pathA.Draw();
@@ -568,14 +569,15 @@ void drawRocksWithGap() {
 
 //scaled down for level 1, collectible, scale it up to be a big treasure chest for level 2
 void drawTreasureChest(){
-glPushMatrix();
-glTranslatef(0, 0, 0);
-glScalef(1.05, 1.05, 1.05);
-model_chest.Draw();
-glPopMatrix();
+	glPushMatrix();
+	glTranslatef(0, 2, -60);
+	glScalef(2, 2, 2);
+	model_chest.Draw();
+	glPopMatrix();
 }
 
 //shell "clam" collectible placed randomly for level1
+//model currently not working "dive.3ds"
 void drawShell(){
 
 	glPushMatrix();
@@ -616,9 +618,9 @@ void drawShell(){
 }
 
 //coral "tree" obstacle in level1
-void drawCoral(){
+void drawCoral(double x, double y, double z){
 	glPushMatrix();
-	glTranslatef(-16, 0, 8); 
+	glTranslatef(x, y, z); 
 	glRotatef(90.0f, 0, 1, 0);
 	glScalef(0.8, 0.8, 0.8);
 	model_coral.Draw();
@@ -704,18 +706,19 @@ void displayCollect()
 
 	RenderGround();
 
-	//drawRocksWithGap();
+	drawRocksWithGap();
 
-	//drawCave();
+	//**add collision to treasure chest**
+	drawTreasureChest();
 
-
+	//add collision to pearl (shaklaha zay el beda fyl le3ba)
 	glPushMatrix();
-	glScaled(5, 5, 5);
-	drawStar(); //working
-	//model_shell.Draw(); //not working
+	glTranslated(25, 1, -25);
+	glScaled(10, 10, 10);
+	model_pearl.Draw();
 	glPopMatrix();
 
-	//drawCoral(); //working
+	drawCoral(CoinPosition.x, CoinPosition.y, CoinPosition.z); //working
 
 	//drawTreasureChest(); //works
 
@@ -778,8 +781,16 @@ void displayCollect()
 	
 	drawSeaWeeds();
 
+	glPushMatrix();
+	glTranslated(5, 1, 0);
 	drawSchoolOfFish();
-	
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(-15, 1, 0);
+	drawSchoolOfFish();
+	glPopMatrix();
+
 	drawSkyBox();
 	
 	renderTextOverlay();
@@ -938,6 +949,7 @@ void LoadAssets()
 	model_rock.Load("Models/rock/ArchTripple.3ds");
 	model_chest.Load("Models/chest/chest.3ds");
 	model_star.Load("Models/star/Star big.3ds");
+	model_pearl.Load("Models/pearls/pearl.3ds");
 	
 	// Loading texture files
 	tex_ground.Load("Textures/sand.bmp");
